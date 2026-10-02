@@ -1,11 +1,36 @@
 <?php
-// Jalankan SEKALI saja, lalu HAPUS file ini.
-include "koneksi.php";
 
-$hash = password_hash("password", PASSWORD_DEFAULT);
+include "config/koneksi.php";
 
-$stmt = mysqli_prepare($koneksi, "UPDATE t_users SET password = ?");
+// Password baru untuk semua akun
+$password = "password";
+
+// Buat hash bcrypt
+$hash = password_hash($password, PASSWORD_DEFAULT);
+
+// Update semua user
+$sql = "UPDATE t_users SET password = ?";
+
+$stmt = mysqli_prepare($koneksi, $sql);
+
+if (!$stmt) {
+    die("Prepare gagal: " . mysqli_error($koneksi));
+}
+
 mysqli_stmt_bind_param($stmt, "s", $hash);
-mysqli_stmt_execute($stmt);
 
-echo "Selesai. " . mysqli_stmt_affected_rows($stmt) . " akun sekarang berpassword: password";
+if (mysqli_stmt_execute($stmt)) {
+
+    echo "<h2>PASSWORD BERHASIL DIPERBAIKI</h2>";
+    echo "<p>Semua akun sekarang menggunakan password:</p>";
+    echo "<h3>password</h3>";
+
+} else {
+
+    echo "Gagal memperbarui password: " . mysqli_stmt_error($stmt);
+}
+
+mysqli_stmt_close($stmt);
+mysqli_close($koneksi);
+
+?>

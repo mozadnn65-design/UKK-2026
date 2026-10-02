@@ -2,9 +2,11 @@
 
 include "config/koneksi.php";
 
+header("Content-Type: application/vnd.ms-excel");
+header("Content-Disposition: attachment; filename=laporan_pelanggaran.xls");
+
 $data = mysqli_query($koneksi, "
     SELECT 
-        ps.id,
         s.nis,
         s.nama,
         pk.nama AS pelanggaran
@@ -16,21 +18,13 @@ $data = mysqli_query($koneksi, "
 
 ?>
 
-<h2>Catatan Pelanggaran Siswa</h2>
-
-<a href="dashboard.php">Kembali</a> |
-<a href="tambah_catatan_pelanggaran.php">Tambah Catatan</a>
-
-<br><br>
-
-<table border="1" cellpadding="8">
+<table border="1">
 
 <tr>
     <th>No</th>
     <th>NIS</th>
     <th>Nama Siswa</th>
-    <th>Pelanggaran</th>
-    <th>Aksi</th>
+    <th>Jenis Pelanggaran</th>
 </tr>
 
 <?php
@@ -42,22 +36,10 @@ while ($row = mysqli_fetch_assoc($data)) {
 ?>
 
 <tr>
-
     <td><?php echo $no; ?></td>
-
     <td><?php echo $row['nis']; ?></td>
-
     <td><?php echo $row['nama']; ?></td>
-
     <td><?php echo $row['pelanggaran']; ?></td>
-
-    <td>
-        <a href="hapus_catatan_pelanggaran.php?id=<?php echo $row['id']; ?>"
-           onclick="return confirm('Yakin ingin menghapus?')">
-            Hapus
-        </a>
-    </td>
-
 </tr>
 
 <?php

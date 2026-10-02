@@ -1,18 +1,56 @@
 <?php
-include "cek_akses.php";
-cek_role(['admin', 'guru']);
+
+include "config/koneksi.php";
+
+$data = mysqli_query($koneksi, "
+    SELECT
+        s.nis,
+        s.nama,
+        SUM(ps.poin) AS total_poin
+    FROM t_pelanggaran_siswa ps
+    JOIN t_siswa s ON ps.siswa_id = s.id
+    GROUP BY s.id
+    ORDER BY total_poin DESC
+");
+
 ?>
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Rekap Poin</title>
-</head>
-<body>
 
-    <h1>Rekap Poin</h1>
-    <p>Halaman Rekap Poin (bisa diakses: admin dan guru)</p>
-    <p><a href="dashboard.php">Kembali ke Dashboard</a></p>
+<h2>Rekap Poin Pelanggaran</h2>
 
-</body>
-</html>
+<a href="dashboard.php">Kembali</a>
+
+<br><br>
+
+<table border="1" cellpadding="8">
+
+<tr>
+    <th>No</th>
+    <th>NIS</th>
+    <th>Nama Siswa</th>
+    <th>Total Poin</th>
+</tr>
+
+<?php
+
+$no = 1;
+
+while ($row = mysqli_fetch_assoc($data)) {
+
+?>
+
+<tr>
+    <td><?php echo $no; ?></td>
+    <td><?php echo $row['nis']; ?></td>
+    <td><?php echo $row['nama']; ?></td>
+    <td><?php echo $row['total_poin']; ?></td>
+</tr>
+
+<?php
+
+$no++;
+
+}
+
+?>
+
+</table>

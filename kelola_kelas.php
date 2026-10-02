@@ -1,18 +1,115 @@
 <?php
-include "cek_akses.php";
-cek_role(['admin']);
+
+session_start();
+
+include "config/koneksi.php";
+
+// Cek login
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
+}
+
+// Cek admin
+if ($_SESSION['role'] != "admin") {
+    echo "Akses ditolak!";
+    exit;
+}
+
+// Mengambil data kelas
+$query = mysqli_query($koneksi, "SELECT * FROM t_kelas ORDER BY id DESC");
+
 ?>
+
 <!DOCTYPE html>
-<html lang="id">
+<html>
+
 <head>
-    <meta charset="UTF-8">
     <title>Kelola Kelas</title>
 </head>
+
 <body>
 
-    <h1>Kelola Kelas</h1>
-    <p>Halaman Kelola Kelas (bisa diakses: admin)</p>
-    <p><a href="dashboard.php">Kembali ke Dashboard</a></p>
+<h2>Kelola Kelas</h2>
+
+<a href="dashboard.php">Kembali ke Dashboard</a>
+
+<br><br>
+
+<a href="tambah_kelas.php">+ Tambah Kelas</a>
+
+<br><br>
+
+<table border="1" cellpadding="8" cellspacing="0">
+
+    <tr>
+        <th>No</th>
+        <th>Nama Kelas</th>
+        <th>Tingkat</th>
+        <th>Jurusan</th>
+        <th>Status</th>
+        <th>Aksi</th>
+    </tr>
+
+    <?php
+
+    $no = 1;
+
+    while ($kelas = mysqli_fetch_assoc($query)) {
+
+    ?>
+
+    <tr>
+
+        <td><?php echo $no; ?></td>
+
+        <td><?php echo $kelas['nama']; ?></td>
+
+        <td><?php echo $kelas['tingkat']; ?></td>
+
+        <td><?php echo $kelas['jurusan']; ?></td>
+
+        <td>
+
+            <?php
+
+            if ($kelas['status_aktif'] == 1) {
+                echo "Aktif";
+            } else {
+                echo "Tidak Aktif";
+            }
+
+            ?>
+
+        </td>
+
+        <td>
+
+            <a href="edit_kelas.php?id=<?php echo $kelas['id']; ?>">
+                Edit
+            </a>
+
+            |
+
+            <a href="hapus_kelas.php?id=<?php echo $kelas['id']; ?>"
+               onclick="return confirm('Yakin ingin menghapus kelas ini?')">
+                Hapus
+            </a>
+
+        </td>
+
+    </tr>
+
+    <?php
+
+        $no++;
+
+    }
+
+    ?>
+
+</table>
 
 </body>
+
 </html>
