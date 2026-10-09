@@ -19,7 +19,8 @@ if (isset($_POST['update'])) {
     mysqli_query($koneksi, "UPDATE t_pelanggaran_kategori SET
         nama='$nama',
         deskripsi='$deskripsi',
-        status_aktif='$status'
+        status_aktif='$status',
+        updated_at=NOW()
         WHERE id='$id'
     ");
 

@@ -12,7 +12,7 @@ if (isset($_POST['update'])) {
         guru_id='$_POST[guru]',
         tanggal_mulai='$_POST[mulai]',
         tanggal_selesai='$_POST[selesai]',
-        status_aktif='$_POST[status]'
+        status_aktif='$_POST[status]',
         WHERE id='$id'");
 
     header("Location: kelola_wali_kelas.php");

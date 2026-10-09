@@ -1,9 +1,8 @@
 <?php
-
-// CEK SESSION
+// Memeriksa session login
 include "includes/cek_session.php";
 
-// AMBIL DATA SESSION
+// Mengambil data pengguna
 $nama = $_SESSION['nama'] ?? $_SESSION['nama_lengkap'] ?? 'Pengguna';
 $email = $_SESSION['email'] ?? '-';
 $role = $_SESSION['role'] ?? '-';
@@ -13,58 +12,49 @@ $role = $_SESSION['role'] ?? '-';
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard Aplikasi Pelanggaran Siswa</title>
+    <title>Dashboard Pelanggaran Siswa</title>
 </head>
-
 <body>
 
     <h1>Dashboard Aplikasi Pelanggaran Siswa</h1>
 
-    <p>Selamat datang,</p>
-
-    <strong><?php echo htmlspecialchars($nama); ?></strong>
-
-    <p>Email: <?php echo htmlspecialchars($email); ?></p>
-
-    <p>Role: <?php echo htmlspecialchars($role); ?></p>
+    <!-- Menampilkan data pengguna -->
+    <p>Selamat datang, <b><?php echo $nama; ?></b></p>
+    <p>Email: <?php echo $email; ?></p>
+    <p>Role: <?php echo $role; ?></p>
 
     <hr>
 
-    <?php if ($role === 'admin'): ?>
+    <?php
+    // Menu untuk admin
+    if ($role == 'admin') {
+        echo "<h3>Menu Admin</h3>";
+        echo '<p><a href="kelola_guru.php">Kelola Guru</a></p>';
+        echo '<p><a href="kelola_siswa.php">Kelola Siswa</a></p>';
+        echo '<p><a href="kelola_kelas.php">Kelola Kelas</a></p>';
+        echo '<p><a href="kelola_tahun_ajaran.php">Kelola Tahun Ajaran</a></p>';
+        echo '<p><a href="penempatan_siswa.php">Penempatan Siswa</a></p>';
+        echo '<p><a href="kelola_wali_kelas.php">Kelola Wali Kelas</a></p>';
+        echo '<p><a href="kelola_kategori_pelanggaran.php">Kelola Kategori Pelanggaran</a></p>';
+        echo '<p><a href="kelola_jenis_pelanggaran.php">Kelola Jenis Pelanggaran</a></p>';
+        echo '<p><a href="Laporan.php">Laporan</a></p>';
+    }
 
-        <h3>Admin</h3>
-
-        <p><a href="kelola_guru.php">kelola guru</a></p>
-        <p><a href="kelola_siswa.php">kelola siswa</a></p>
-        <p><a href="kelola_kelas.php">kelola kelas</a></p>
-        <p><a href="kelola_tahun_ajaran.php">Kelola Tahun Ajaran</a></p>
-        <p><a href="penempatan_siswa.php">Penempatan Siswa</a></p>
-        <p><a href="kelola_wali_kelas.php">Kelola Wali Kelas</a></p>
-        <p><a href="kelola_kategori_pelanggaran.php">Kelola Kategori Pelanggaran</a></p>
-        <p><a href="Laporan.php">Laporan</a></p>
-        <p><a href="kelola_jenis_pelanggaran.php">Kelola Jenis Pelanggaran</a></p>
-        <p><a href="catatan_pelanggaran.php">Catatan Pelanggaran</a></p>
-        <p><a href="tindakan.php">Tindakan</a></p>
-        <p><a href="riwayat.php">Riwayat</a></p>
-        <p><a href="rekap_poin.php">Rekap Poin</a></p>
-
-    <?php endif; ?>
-
-    <?php if ($role === 'guru'): ?>
-
-    <h3>Guru</h3>
-
-    <p><a href="catatan_pelanggaran.php">Catatan Pelanggaran</a></p>
-    <p><a href="tindakan.php">Tindakan</a></p>
-    <p><a href="riwayat.php">Riwayat</a></p>
-    <p><a href="rekap_poin.php">Rekap Poin</a></p>
-
-    <?php endif; ?>
-    
+    // Menu untuk guru
+    if ($role == 'guru') {
+        echo "<h3>Menu Guru</h3>";
+        echo '<p><a href="catat_pelanggaran.php">Catat Pelanggaran</a></p>';
+        echo '<p><a href="tindakan.php">Tindakan</a></p>';
+        echo '<p><a href="riwayat.php">Riwayat</a></p>';
+        echo '<p><a href="rekap_poin.php">Rekap Poin</a></p>';
+    }
+    ?>
 
     <hr>
 
+    <!-- Tombol logout -->
     <p><a href="logout.php">Logout</a></p>
 
 </body>
 </html>
+
