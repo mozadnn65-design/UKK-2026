@@ -1,4 +1,3 @@
-
 <?php
 // Menghubungkan database
 include "config/koneksi.php";

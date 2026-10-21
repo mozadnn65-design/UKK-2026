@@ -49,6 +49,8 @@ $hasil = mysqli_query($koneksi, $sql);
             </div>
 
             <!-- TABEL DATA TAHUN AJARAN -->
+             <div class="card shadow-sm">
+                <div class="card-body">
             <div class="table-responsive">
 
                 <table id="tabelTahunAjaran"
@@ -57,7 +59,7 @@ $hasil = mysqli_query($koneksi, $sql);
                     <thead class="table-dark">
                         <tr>
                             <th>ID</th>
-                            <th>Nama Tahun Ajaran</th>
+                            <th>Tahun Ajaran</th>
                             <th>Tanggal Mulai</th>
                             <th>Tanggal Selesai</th>
                             <th>Status Aktif</th>
@@ -160,12 +162,8 @@ $(document).ready(function () {
                 previous: "Sebelumnya"
             }
         },
-
-        pageLength: 10,
-
-        lengthMenu: [5, 10, 25, 50, 100],
-
-        order: [[2, 'desc']]
+pageLength: 10,
+        order: [[0, 'asc']]
     });
 
 });

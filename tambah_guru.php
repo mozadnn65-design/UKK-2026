@@ -1,3 +1,4 @@
+
 <?php
 
 session_start();
@@ -16,15 +17,27 @@ if ($_SESSION['role'] != "admin") {
 
 if (isset($_POST['simpan'])) {
 
+    $user_id = $_SESSION['user_id'];
     $nip = $_POST['nip'];
     $nama = $_POST['nama'];
     $email = $_POST['email'];
     $status = $_POST['status_aktif'];
 
-    $query = mysqli_query($koneksi, "INSERT INTO t_guru
-        (nip, nama, email, status_aktif, created_at, updated_at)
-        VALUES
-        ('$nip', '$nama', '$email', '$status', NOW(), NOW())");
+    $stmt = mysqli_prepare($koneksi, "INSERT INTO t_guru
+        (user_id, nip, nama, email, status_aktif, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, NOW(), NOW())");
+
+    mysqli_stmt_bind_param(
+        $stmt,
+        "issss",
+        $user_id,
+        $nip,
+        $nama,
+        $email,
+        $status
+    );
+
+    $query = mysqli_stmt_execute($stmt);
 
     if ($query) {
 
@@ -37,6 +50,7 @@ if (isset($_POST['simpan'])) {
 
     }
 
+    mysqli_stmt_close($stmt);
 }
 
 ?>
@@ -76,26 +90,21 @@ if (isset($_POST['simpan'])) {
     <br>
 
     <select name="status_aktif">
-
         <option value="aktif">Aktif</option>
-
-        <option value="tidak aktif">
-            Tidak Aktif
-        </option>
-
+        <option value="tidak aktif">Tidak Aktif</option>
     </select>
 
     <br><br>
 
-<button type="submit" name="simpan">
-    Simpan
-</button>
+    <button type="submit" name="simpan">
+        Simpan
+    </button>
 
-<br><br>
+    <br><br>
 
-<a href="kelola_guru.php">Kembali</a>
+    <a href="kelola_guru.php">Kembali</a>
 
-<br><br>
+    <br><br>
 
 </form>
 

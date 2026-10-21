@@ -192,20 +192,8 @@ $(document).ready(function () {
                 previous: "Sebelumnya"
             }
         },
-
-        pageLength: 10,
-
-        lengthMenu: [5, 10, 25, 50, 100],
-
-        order: [[3, 'asc']],
-
-        columnDefs: [
-            {
-                targets: 8,
-                orderable: false,
-                searchable: false
-            }
-        ]
+pageLength: 10,
+        order: [[0, 'asc']]
 
     });
 

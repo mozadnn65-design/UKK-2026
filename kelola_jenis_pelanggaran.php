@@ -58,14 +58,17 @@ $data = mysqli_query($koneksi, "SELECT * FROM t_pelanggaran ORDER BY id DESC");
                 </a>
             </div>
 
-            <!-- TABEL DATA -->
-            <div class="card shadow-sm">
+            <!-- TABEL JENIS PELANGGARAN -->
+                <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Daftar Jenis Pelanggaran</h5>
+                </div>
+
                 <div class="card-body">
-
-                    <h5 class="card-title mb-3">Data Jenis Pelanggaran</h5>
-
                     <div class="table-responsive">
-                        <table id="tabelPelanggaran" class="table table-bordered table-striped table-hover align-middle">
+
+                        <table id="tabelPelanggaran"
+                               class="table table-striped table-bordered table-hover align-middle w-100">
 
                             <thead class="table-dark">
                                 <tr>

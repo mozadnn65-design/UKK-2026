@@ -57,6 +57,8 @@ $hasil = mysqli_query($koneksi, $sql);
             </div>
 
             <!-- TABEL DATA WALI KELAS -->
+             <div class="card shadow-sm">
+            <div class="card-body">
             <div class="table-responsive">
 
                 <table id="tabelWaliKelas"
@@ -166,12 +168,8 @@ $(document).ready(function () {
                 previous: "Sebelumnya"
             }
         },
-
         pageLength: 10,
-
-        lengthMenu: [5, 10, 25, 50, 100],
-
-        order: [[0, 'desc']]
+                order: [[0, 'asc']]
     });
 
 });

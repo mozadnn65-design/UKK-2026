@@ -68,69 +68,45 @@ $hasil = mysqli_query($koneksi, $sql);
                                 </tr>
                             </thead>
 
-                            <tbody>
+                        <tbody>
+    <?php
+    $no = 1;
 
-                            <?php while ($row = mysqli_fetch_assoc($hasil)) {   ?>
+    while ($row = mysqli_fetch_assoc($hasil)) {
+    ?>
+        <tr>
+            <td><?= $no++; ?></td>
+            <td><?= htmlspecialchars($row['id']) ?></td>
+            <td><?= htmlspecialchars($row['nip'] ?? '') ?></td>
+            <td><?= htmlspecialchars($row['nama'] ?? '') ?></td>
+            <td><?= htmlspecialchars($row['email'] ?? '') ?></td>
 
-                                <tr>
-                                    <td><?= $no++; ?></td>
-                                    <td>
-                                        <?= htmlspecialchars($row['id']) ?>
-                                    </td>
+            <td>
+                <?php if ($row['status_aktif'] == 1) { ?>
+                    <span class="badge bg-success">Aktif</span>
+                <?php } else { ?>
+                    <span class="badge bg-danger">Tidak Aktif</span>
+                <?php } ?>
+            </td>
 
-                                    <td>
-                                        <?= htmlspecialchars($row['nip'] ?? '') ?>
-                                    </td>
+            <td><?= htmlspecialchars($row['created_at'] ?? '-') ?></td>
+            <td><?= htmlspecialchars($row['updated_at'] ?? '-') ?></td>
 
-                                    <td>
-                                        <?= htmlspecialchars($row['nama'] ?? '') ?>
-                                    </td>
+            <td>
+                <div class="d-flex gap-2">
+                    <a href="edit_guru.php?id=<?= urlencode($row['id']) ?>"
+                       class="btn btn-warning btn-sm">Edit</a>
 
-                                    <td>
-                                        <?= htmlspecialchars($row['email'] ?? '') ?>
-                                    </td>
-
-                                    <td>
-                                        <?php if ($row['status_aktif'] == 1) { ?>
-                                            <span class="badge bg-success">
-                                                Aktif
-                                            </span>
-                                        <?php } else { ?>
-                                            <span class="badge bg-danger">
-                                                Tidak Aktif
-                                            </span>
-                                        <?php } ?>
-                                    </td>
-
-                                    <td>
-                                        <?= htmlspecialchars($row['created_at'] ?? '-') ?>
-                                    </td>
-
-                                    <td>
-                                        <?= htmlspecialchars($row['updated_at'] ?? '-') ?>
-                                    </td>
-
-                                    <td>
-                                        <div class="d-flex gap-2">
-
-                                            <a href="edit_guru.php?id=<?= urlencode($row['id']) ?>"
-                                               class="btn btn-warning btn-sm">
-                                                Edit
-                                            </a>
-
-                                            <a href="hapus_guru.php?id=<?= urlencode($row['id']) ?>"
-                                               class="btn btn-danger btn-sm"
-                                               onclick="return confirm('Yakin ingin menghapus data guru ini?');">
-                                                Hapus
-                                            </a>
-
-                                        </div>
-                                    </td>
-                                </tr>
-
-                            <?php } ?>
-
-                            </tbody>
+                    <a href="hapus_guru.php?id=<?= urlencode($row['id']) ?>"
+                       class="btn btn-danger btn-sm"
+                       onclick="return confirm('Yakin ingin menghapus data guru ini?');">
+                        Hapus
+                    </a>
+                </div>
+            </td>
+        </tr>
+    <?php } ?>
+</tbody>
                         </table>
                     </div>
 
@@ -170,16 +146,8 @@ $(document).ready(function () {
             }
         },
 
-        pageLength: 10,
-        lengthMenu: [5, 10, 25, 50, 100],
-        order: [[2, 'asc']],
-        columnDefs: [
-            {
-                targets: 7,
-                orderable: false,
-                searchable: false
-            }
-        ]
+pageLength: 10,
+        order: [[0, 'asc']]
     });
 });
 </script>
