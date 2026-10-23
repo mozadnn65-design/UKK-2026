@@ -1,50 +1,112 @@
+
 <?php
-include "config/koneksi.php";
-
-if (isset($_POST['simpan'])) {
-
-    $nama = $_POST['nama'];
-    $deskripsi = $_POST['deskripsi'];
-    $status = $_POST['status'];
-
-    mysqli_query($koneksi, "INSERT INTO t_pelanggaran_kategori
-        (nama, deskripsi, status_aktif)
-        VALUES
-        ('$nama', '$deskripsi', '$status')");
-
-    header("Location: kelola_pelanggaran_kategori.php");
-}
+// tambah_pelanggaran_kategori.php
+include 'includes/cek_session.php';
 ?>
 
-<h2>Tambah Kategori Pelanggaran</h2>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tambah Kategori Pelanggaran</title>
 
-<form method="POST">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+</head>
 
-Nama:
-<br>
-<input type="text" name="nama">
+<body>
+<div class="container-fluid">
+    <div class="row">
 
-<br><br>
+        <?php include 'layout/sidebar.php'; ?>
 
-Deskripsi:
-<br>
-<textarea name="deskripsi"></textarea>
+        <main class="col-md-9 col-lg-10 p-4">
 
-<br><br>
+            <h1 class="mb-4">Tambah Kategori Pelanggaran</h1>
 
-Status:
-<br>
-<select name="status">
-    <option value="1">Aktif</option>
-    <option value="0">Tidak Aktif</option>
-</select>
+            <?php if (isset($_SESSION['pesan_error'])) { ?>
+                <div class="alert alert-danger">
+                    <?= htmlspecialchars($_SESSION['pesan_error']); ?>
+                </div>
+                <?php unset($_SESSION['pesan_error']); ?>
+            <?php } ?>
 
-<br><br>
+            <?php if (isset($_SESSION['pesan_sukses'])) { ?>
+                <div class="alert alert-success">
+                    <?= htmlspecialchars($_SESSION['pesan_sukses']); ?>
+                </div>
+                <?php unset($_SESSION['pesan_sukses']); ?>
+            <?php } ?>
 
-<button name="simpan">Simpan</button>
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    Form Tambah Kategori Pelanggaran
+                </div>
 
-</form>
+                <div class="card-body">
 
-<br>
+                    <form action="proses_tambah_pelanggaran_kategori.php"
+                          method="POST">
 
-<a href="kelola_pelanggaran_kategori.php">Kembali</a>
+                        <div class="mb-3">
+                            <label for="nama" class="form-label">
+                                Nama Kategori
+                            </label>
+
+                            <input type="text"
+                                   name="nama"
+                                   id="nama"
+                                   class="form-control"
+                                   placeholder="Contoh: Pelanggaran Ringan"
+                                   maxlength="100"
+                                   required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="deskripsi" class="form-label">
+                                Deskripsi
+                            </label>
+
+                            <textarea name="deskripsi"
+                                      id="deskripsi"
+                                      class="form-control"
+                                      rows="4"
+                                      placeholder="Masukkan deskripsi kategori pelanggaran"></textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="status_aktif" class="form-label">
+                                Status Aktif
+                            </label>
+
+                            <select name="status_aktif"
+                                    id="status_aktif"
+                                    class="form-select"
+                                    required>
+                                <option value="1">Aktif</option>
+                                <option value="0">Tidak Aktif</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            Simpan Kategori
+                        </button>
+
+                        <a href="kelola_pelanggaran_kategori.php"
+                           class="btn btn-secondary">
+                            Kembali
+                        </a>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

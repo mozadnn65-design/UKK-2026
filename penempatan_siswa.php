@@ -1,20 +1,13 @@
+
 <?php
 // penempatan_siswa.php
 include 'includes/cek_session.php';
 include 'config/koneksi.php';
 
-// Mengambil data penempatan siswa
-$sql = "SELECT
-            ks.id,
-            s.nis,
-            s.nama AS nama_siswa,
-            ta.nama AS tahun_ajaran,
-            k.nama AS nama_kelas,
-            k.tingkat,
-            k.jurusan,
-            ks.tanggal_mulai,
-            ks.tanggal_selesai,
-            ks.status_aktif
+$sql = "SELECT ks.id, s.nis, s.nama AS nama_siswa,
+        ta.nama AS tahun_ajaran, k.nama AS nama_kelas,
+        k.tingkat, k.jurusan, ks.tanggal_mulai,
+        ks.tanggal_selesai, ks.status_aktif
         FROM t_kelas_siswa ks
         LEFT JOIN t_siswa s ON ks.siswa_id = s.id
         LEFT JOIN t_tahun_ajaran ta ON ks.tahun_ajaran_id = ta.id
@@ -31,15 +24,11 @@ $hasil = mysqli_query($koneksi, $sql);
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Penempatan Siswa</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-
-    <link href="https://cdn.datatables.net/2.3.4/css/dataTables.bootstrap5.min.css"
-          rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/2.3.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 </head>
 
 <body>
-
 <div class="container-fluid">
     <div class="row">
 
@@ -49,7 +38,6 @@ $hasil = mysqli_query($koneksi, $sql);
 
             <h2 class="mb-3">Penempatan Siswa</h2>
 
-            <!-- Pesan sukses -->
             <?php if (isset($_SESSION['pesan_sukses'])) { ?>
                 <div class="alert alert-success">
                     <?= htmlspecialchars($_SESSION['pesan_sukses']); ?>
@@ -57,7 +45,6 @@ $hasil = mysqli_query($koneksi, $sql);
                 <?php unset($_SESSION['pesan_sukses']); ?>
             <?php } ?>
 
-            <!-- Pesan error -->
             <?php if (isset($_SESSION['pesan_error'])) { ?>
                 <div class="alert alert-danger">
                     <?= htmlspecialchars($_SESSION['pesan_error']); ?>
@@ -66,23 +53,18 @@ $hasil = mysqli_query($koneksi, $sql);
             <?php } ?>
 
             <div class="mb-3">
-                <a href="dashboard.php" class="btn btn-secondary">
-                    Kembali ke Dashboard
-                </a>
-
-                <a href="tambah_penempatan_siswa.php"
-                   class="btn btn-primary">
+                <a href="dashboard.php" class="btn btn-secondary">Kembali</a>
+                <a href="tambah_penempatan_siswa.php" class="btn btn-primary">
                     + Tambah Penempatan
                 </a>
             </div>
 
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Data Penempatan Siswa</h5>
+                    Data Penempatan Siswa
                 </div>
 
                 <div class="card-body table-responsive">
-
                     <table id="tabelPenempatan"
                            class="table table-bordered table-striped table-hover align-middle">
 
@@ -98,14 +80,15 @@ $hasil = mysqli_query($koneksi, $sql);
                                 <th>Tanggal Mulai</th>
                                 <th>Tanggal Selesai</th>
                                 <th>Status</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
 
                         <tbody>
                         <?php
-                        if ($hasil && mysqli_num_rows($hasil) > 0) {
-                            $no = 1;
+                        $no = 1;
 
+                        if ($hasil && mysqli_num_rows($hasil) > 0) {
                             while ($row = mysqli_fetch_assoc($hasil)) {
                         ?>
                             <tr>
@@ -125,15 +108,25 @@ $hasil = mysqli_query($koneksi, $sql);
                                         <span class="badge bg-secondary">Tidak Aktif</span>
                                     <?php } ?>
                                 </td>
+                                <td>
+                                    <a href="edit_penempatan_siswa.php?id=<?= $row['id']; ?>"
+                                       class="btn btn-warning btn-sm mb-1">
+                                        Edit
+                                    </a>
+
+                                    <a href="hapus_penempatan_siswa.php?id=<?= $row['id']; ?>"
+                                       class="btn btn-danger btn-sm mb-1"
+                                       onclick="return confirm('Yakin ingin menghapus penempatan siswa ini?')">
+                                        Hapus
+                                    </a>
+                                </td>
                             </tr>
                         <?php
                             }
                         }
                         ?>
                         </tbody>
-
                     </table>
-
                 </div>
             </div>
 

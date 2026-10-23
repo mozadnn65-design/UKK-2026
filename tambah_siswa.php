@@ -1,144 +1,145 @@
+
 <?php
-
-session_start();
-
-include "config/koneksi.php";
-
-// Cek login
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit;
-}
-
-// Cek admin
-if ($_SESSION['role'] != "admin") {
-    echo "Akses ditolak!";
-    exit;
-}
-
-// Proses simpan
-if (isset($_POST['simpan'])) {
-
-    $nis = $_POST['nis'];
-    $nisn = $_POST['nisn'];
-    $nama = $_POST['nama'];
-    $jenis_kelamin = $_POST['jenis_kelamin'];
-    $tanggal_lahir = $_POST['tanggal_lahir'];
-    $alamat = $_POST['alamat'];
-    $status_aktif = $_POST['status_aktif'];
-
-    $query = mysqli_query($koneksi, "INSERT INTO t_siswa
-        (nis, nisn, nama, jenis_kelamin, tanggal_lahir, alamat, status_aktif)
-        VALUES
-        ('$nis', '$nisn', '$nama', '$jenis_kelamin', '$tanggal_lahir', '$alamat', '$status_aktif')");
-
-    if ($query) {
-
-        header("Location: kelola_siswa.php");
-        exit;
-
-    } else {
-
-        echo "Data siswa gagal ditambahkan.";
-
-    }
-
-}
-
+// tambah_siswa.php
+include 'includes/cek_session.php';
 ?>
 
 <!DOCTYPE html>
-<html>
-
+<html lang="id">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tambah Siswa</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-
 <body>
 
-<h2>Tambah Siswa</h2>
+<div class="container-fluid">
+    <div class="row">
 
-<form method="POST">
+        <!-- SIDEBAR -->
+        <?php include 'layout/sidebar.php'; ?>
 
-    NIS:
-    <br>
-    <input type="text" name="nis" required>
+        <!-- KONTEN UTAMA -->
+        <main class="col-md-9 col-lg-10 p-4">
 
-    <br><br>
+            <h1 class="mb-4">Tambah Siswa</h1>
 
-    NISN:
-    <br>
-    <input type="text" name="nisn">
+            <!-- NOTIFIKASI ERROR -->
+            <?php if (isset($_SESSION['pesan_error'])) { ?>
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <?= $_SESSION['pesan_error']; ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <?php unset($_SESSION['pesan_error']); ?>
+            <?php } ?>
 
-    <br><br>
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    Form Tambah Siswa
+                </div>
 
-    Nama:
-    <br>
-    <input type="text" name="nama" required>
+                <div class="card-body">
+                    <form action="proses_tambah_siswa.php" method="POST" id="formTambahSiswa">
 
-    <br><br>
+                        <div class="mb-3">
+                            <label class="form-label">NIS</label>
+                            <input type="text" name="nis" id="nis"
+                                   class="form-control" maxlength="10"
+                                   pattern="[0-9]{10}" inputmode="numeric"
+                                   title="NIS harus tepat 10 angka" required>
+                            <div class="form-text">NIS harus terdiri dari 10 angka.</div>
+                        </div>
 
-    Jenis Kelamin:
-    <br>
+                        <div class="mb-3">
+                            <label class="form-label">NISN</label>
+                            <input type="text" name="nisn" id="nisn"
+                                   class="form-control" maxlength="10"
+                                   pattern="[0-9]{10}" inputmode="numeric"
+                                   title="NISN harus tepat 10 angka" required>
+                            <div class="form-text">NISN harus terdiri dari 10 angka.</div>
+                        </div>
 
-    <select name="jenis_kelamin" required>
+                        <div class="mb-3">
+                            <label class="form-label">Nama Siswa</label>
+                            <input type="text" name="nama"
+                                   class="form-control" required>
+                        </div>
 
-        <option value="">-- Pilih --</option>
+                        <div class="mb-3">
+                            <label class="form-label d-block">Jenis Kelamin</label>
 
-        <option value="L">
-            Laki-laki
-        </option>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio"
+                                       name="jenis_kelamin" id="laki"
+                                       value="L" required>
+                                <label class="form-check-label" for="laki">Laki-laki</label>
+                            </div>
 
-        <option value="P">
-            Perempuan
-        </option>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio"
+                                       name="jenis_kelamin" id="perempuan"
+                                       value="P" required>
+                                <label class="form-check-label" for="perempuan">Perempuan</label>
+                            </div>
+                        </div>
 
-    </select>
+                        <div class="mb-3">
+                            <label class="form-label">Tanggal Lahir</label>
+                            <input type="date" name="tanggal_lahir"
+                                   class="form-control" required>
+                        </div>
 
-    <br><br>
+                        <div class="mb-3">
+                            <label class="form-label">Alamat</label>
+                            <textarea name="alamat" class="form-control"
+                                      rows="4" required></textarea>
+                        </div>
 
-    Tanggal Lahir:
-    <br>
-    <input type="date" name="tanggal_lahir" required>
+                        <div class="mb-4">
+                            <label class="form-label">Status Aktif</label>
+                            <select name="status_aktif" class="form-select" required>
+                                <option value="1">Aktif</option>
+                                <option value="0">Tidak Aktif</option>
+                            </select>
+                        </div>
 
-    <br><br>
+                        <button type="submit" class="btn btn-primary">
+                            Simpan Siswa
+                        </button>
 
-    Alamat:
-    <br>
+                        <a href="kelola_siswa.php" class="btn btn-secondary">
+                            Kembali
+                        </a>
 
-    <textarea name="alamat" rows="4" cols="40"></textarea>
+                    </form>
+                </div>
+            </div>
 
-    <br><br>
+        </main>
+    </div>
+</div>
 
-    Status:
-    <br>
+<script>
+document.getElementById('formTambahSiswa').addEventListener('submit', function(e) {
+    const nis = document.getElementById('nis').value.trim();
+    const nisn = document.getElementById('nisn').value.trim();
 
-    <select name="status_aktif">
+    if (!/^[0-9]{10}$/.test(nis)) {
+        e.preventDefault();
+        alert('NIS harus tepat 10 angka!');
+        document.getElementById('nis').focus();
+        return;
+    }
 
-        <option value="1">
-            Aktif
-        </option>
+    if (!/^[0-9]{10}$/.test(nisn)) {
+        e.preventDefault();
+        alert('NISN harus tepat 10 angka!');
+        document.getElementById('nisn').focus();
+    }
+});
+</script>
 
-        <option value="0">
-            Tidak Aktif
-        </option>
-
-    </select>
-
-    <br><br>
-
-    <button type="submit" name="simpan">
-        Simpan
-    </button>
-
-    <br><br>
-
-    <a href="kelola_siswa.php">
-        Kembali
-    </a>
-
-</form>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

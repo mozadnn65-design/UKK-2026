@@ -34,9 +34,27 @@ $hasil = mysqli_query($koneksi, $sql);
 
         <!-- KONTEN -->
         <main class="col-md-9 col-lg-10 p-4">
+      
+            <h2 class="mb-4">Kelola Siswa</h2>
+          <?php
+            if (isset($_SESSION['pesan_sukses'])) {
+                echo '<div class="alert alert-success alert-dismissible fade show" role="alert">';
+                echo $_SESSION['pesan_sukses'];
+                echo '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+                echo '</div>';
 
-            <h1 class="mb-4">Kelola Siswa</h1>
+                unset($_SESSION['pesan_sukses']);
+            }
 
+            if (isset($_SESSION['pesan_error'])) {
+                echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
+                echo $_SESSION['pesan_error'];
+                echo '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+                echo '</div>';
+
+                unset($_SESSION['pesan_error']);
+            }
+            ?>
             <!-- Tombol Navigasi -->
             <div class="mb-3">
                 <a href="dashboard.php" class="btn btn-secondary">
@@ -59,7 +77,7 @@ $hasil = mysqli_query($koneksi, $sql);
 
                             <thead class="table-dark">
                                 <tr>
-                                    <th>ID</th>
+                                    <th>No</th>
                                     <th>NIS</th>
                                     <th>NISN</th>
                                     <th>Nama Siswa</th>
@@ -72,82 +90,55 @@ $hasil = mysqli_query($koneksi, $sql);
                             </thead>
 
                             <tbody>
+                                <?php
+                                $no = 1;
 
-                            <?php while ($row = mysqli_fetch_assoc($hasil)) { ?>
+                                while ($row = mysqli_fetch_assoc($hasil)) {
+                                ?>
+                                    <tr>
+                                        <td><?= $no++ ?></td>
 
-                                <tr>
-                                    <td>
-                                        <?= htmlspecialchars($row['id']) ?>
-                                    </td>
+                                        <td><?= htmlspecialchars($row['nis'] ?? '') ?></td>
+                                        <td><?= htmlspecialchars($row['nisn'] ?? '') ?></td>
+                                        <td><?= htmlspecialchars($row['nama'] ?? '') ?></td>
 
-                                    <td>
-                                        <?= htmlspecialchars($row['nis'] ?? '') ?>
-                                    </td>
+                                        <td>
+                                            <?php
+                                            if ($row['jenis_kelamin'] == 'L') {
+                                                echo "Laki-laki";
+                                            } elseif ($row['jenis_kelamin'] == 'P') {
+                                                echo "Perempuan";
+                                            } else {
+                                                echo "-";
+                                            }
+                                            ?>
+                                        </td>
 
-                                    <td>
-                                        <?= htmlspecialchars($row['nisn'] ?? '') ?>
-                                    </td>
+                                        <td><?= htmlspecialchars($row['tanggal_lahir'] ?? '-') ?></td>
+                                        <td><?= htmlspecialchars($row['alamat'] ?? '-') ?></td>
 
-                                    <td>
-                                        <?= htmlspecialchars($row['nama'] ?? '') ?>
-                                    </td>
+                                        <td>
+                                            <?php if ($row['status_aktif'] == 1) { ?>
+                                                <span class="badge bg-success">Aktif</span>
+                                            <?php } else { ?>
+                                                <span class="badge bg-danger">Tidak Aktif</span>
+                                            <?php } ?>
+                                        </td>
 
-                                    <td>
-                                        <?php
-                                        if ($row['jenis_kelamin'] == 'L') {
-                                            echo "Laki-laki";
-                                        } elseif ($row['jenis_kelamin'] == 'P') {
-                                            echo "Perempuan";
-                                        } else {
-                                            echo "-";
-                                        }
-                                        ?>
-                                    </td>
+                                        <td>
+                                            <div class="d-flex gap-2">
+                                                <a href="edit_siswa.php?id=<?= urlencode($row['id']) ?>"
+                                                class="btn btn-warning btn-sm">Edit</a>
 
-                                    <td>
-                                        <?= htmlspecialchars($row['tanggal_lahir'] ?? '-') ?>
-                                    </td>
-
-                                    <td>
-                                        <?= htmlspecialchars($row['alamat'] ?? '-') ?>
-                                    </td>
-
-                                    <td>
-                                        <?php if ($row['status_aktif'] == 1) { ?>
-
-                                            <span class="badge bg-success">
-                                                Aktif
-                                            </span>
-
-                                        <?php } else { ?>
-
-                                            <span class="badge bg-danger">
-                                                Tidak Aktif
-                                            </span>
-
-                                        <?php } ?>
-                                    </td>
-
-                                    <td>
-                                        <div class="d-flex gap-2">
-
-                                            <a href="edit_siswa.php?id=<?= urlencode($row['id']) ?>"
-                                               class="btn btn-warning btn-sm">
-                                                Edit
-                                            </a>
-
-                                            <a href="hapus_siswa.php?id=<?= urlencode($row['id']) ?>"
-                                               class="btn btn-danger btn-sm"
-                                               onclick="return confirm('Yakin ingin menghapus data siswa ini?');">
-                                                Hapus
-                                            </a>
-
-                                        </div>
-                                    </td>
-                                </tr>
-
-                            <?php } ?>
-
+                                                <a href="hapus_siswa.php?id=<?= urlencode($row['id']) ?>"
+                                                class="btn btn-danger btn-sm"
+                                                onclick="return confirm('Yakin ingin menghapus data siswa ini?');">
+                                                    Hapus
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php } ?>
                             </tbody>
 
                         </table>

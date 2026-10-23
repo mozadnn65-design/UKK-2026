@@ -1,3 +1,4 @@
+
 <?php
 // kelola_tahun_ajaran.php
 include 'includes/cek_session.php';
@@ -9,20 +10,14 @@ $hasil = mysqli_query($koneksi, $sql);
 
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Kelola Tahun Ajaran</title>
 
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-
-    <!-- DataTables Bootstrap 5 -->
-    <link href="https://cdn.datatables.net/2.3.4/css/dataTables.bootstrap5.min.css"
-          rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/2.3.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -32,12 +27,29 @@ $hasil = mysqli_query($koneksi, $sql);
 
         <?php include 'layout/sidebar.php'; ?>
 
-        <!-- KONTEN -->
         <main class="col-md-9 col-lg-10 p-4">
 
             <h2>Kelola Tahun Ajaran</h2>
             <p>Selamat datang di halaman Tahun Ajaran.</p>
+          <?php
+            if (isset($_SESSION['pesan_sukses'])) {
+                echo '<div class="alert alert-success alert-dismissible fade show" role="alert">';
+                echo $_SESSION['pesan_sukses'];
+                echo '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+                echo '</div>';
 
+                unset($_SESSION['pesan_sukses']);
+            }
+
+            if (isset($_SESSION['pesan_error'])) {
+                echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
+                echo $_SESSION['pesan_error'];
+                echo '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+                echo '</div>';
+
+                unset($_SESSION['pesan_error']);
+            }
+            ?>
             <div class="mb-3">
                 <a href="dashboard.php" class="btn btn-secondary">
                     Kembali ke Dashboard
@@ -48,100 +60,79 @@ $hasil = mysqli_query($koneksi, $sql);
                 </a>
             </div>
 
-            <!-- TABEL DATA TAHUN AJARAN -->
-             <div class="card shadow-sm">
+            <div class="card shadow-sm">
                 <div class="card-body">
-            <div class="table-responsive">
 
-                <table id="tabelTahunAjaran"
-                       class="table table-striped table-bordered table-hover">
+                    <div class="table-responsive">
+                        <table id="tabelTahunAjaran" class="table table-striped table-bordered table-hover">
 
-                    <thead class="table-dark">
-                        <tr>
-                            <th>ID</th>
-                            <th>Tahun Ajaran</th>
-                            <th>Tanggal Mulai</th>
-                            <th>Tanggal Selesai</th>
-                            <th>Status Aktif</th>
-                            <th>Dibuat</th>
-                            <th>Diubah</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Tahun Ajaran</th>
+                                    <th>Tanggal Mulai</th>
+                                    <th>Tanggal Selesai</th>
+                                    <th>Status Aktif</th>
+                                    <th>Dibuat</th>
+                                    <th>Diubah</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
 
-                    <tbody>
+                            <tbody>
+                                <?php while ($row = mysqli_fetch_assoc($hasil)) { ?>
+                                    <tr>
+                                        <!-- Nomor otomatis diatur oleh DataTables -->
+                                        <td></td>
 
-                    <?php while ($row = mysqli_fetch_assoc($hasil)) { ?>
+                                        <td><?= htmlspecialchars($row['nama']) ?></td>
 
-                        <tr>
-                            <td>
-                                <?php echo htmlspecialchars($row['id']); ?>
-                            </td>
+                                        <td><?= htmlspecialchars($row['tanggal_mulai'] ?? '') ?></td>
 
-                            <td>
-                                <?php echo htmlspecialchars($row['nama']); ?>
-                            </td>
+                                        <td><?= htmlspecialchars($row['tanggal_selesai'] ?? '') ?></td>
 
-                            <td>
-                                <?php echo htmlspecialchars($row['tanggal_mulai'] ?? ''); ?>
-                            </td>
+                                        <td>
+                                            <?php if ($row['status_aktif'] == 1) { ?>
+                                                <span class="badge bg-success">Aktif</span>
+                                            <?php } else { ?>
+                                                <span class="badge bg-danger">Tidak Aktif</span>
+                                            <?php } ?>
+                                        </td>
 
-                            <td>
-                                <?php echo htmlspecialchars($row['tanggal_selesai'] ?? ''); ?>
-                            </td>
+                                        <td><?= htmlspecialchars($row['created_at'] ?? '') ?></td>
 
-                            <td>
-                                <?php
-                                if ($row['status_aktif'] == 1) {
-                                    echo "Aktif";
-                                } else {
-                                    echo "Tidak Aktif";
-                                }
-                                ?>
-                            </td>
+                                        <td><?= htmlspecialchars($row['updated_at'] ?? '') ?></td>
 
-                            <td>
-                                <?php echo htmlspecialchars($row['created_at'] ?? ''); ?>
-                            </td>
+                                        <td>
+                                            <a href="edit_tahun_ajaran.php?id=<?= urlencode($row['id']) ?>"
+                                               class="btn btn-warning btn-sm">
+                                                Edit
+                                            </a>
 
-                            <td>
-                                <?php echo htmlspecialchars($row['updated_at'] ?? ''); ?>
-                            </td>
+                                            <a href="hapus_tahun_ajaran.php?id=<?= urlencode($row['id']) ?>"
+                                               class="btn btn-danger btn-sm"
+                                               onclick="return confirm('Yakin ingin menghapus data tahun ajaran ini?');">
+                                                Hapus
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <?php } ?>
+                            </tbody>
 
-                            <td>
-                                <a href="edit_tahun_ajaran.php?id=<?php echo urlencode($row['id']); ?>"
-                                   class="btn btn-warning btn-sm">
-                                    Edit
-                                </a>
+                        </table>
+                    </div>
 
-                                <a href="hapus_tahun_ajaran.php?id=<?php echo urlencode($row['id']); ?>"
-                                   class="btn btn-danger btn-sm"
-                                   onclick="return confirm('Yakin ingin menghapus data tahun ajaran ini?');">
-                                    Hapus
-                                </a>
-                            </td>
-                        </tr>
-
-                    <?php } ?>
-
-                    </tbody>
-
-                </table>
-
+                </div>
             </div>
 
         </main>
     </div>
 </div>
 
-<!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
-<!-- DataTables -->
 <script src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/2.3.4/js/dataTables.bootstrap5.min.js"></script>
 
-<!-- Mengaktifkan DataTables -->
 <script>
 $(document).ready(function () {
 
@@ -152,6 +143,7 @@ $(document).ready(function () {
             lengthMenu: "Tampilkan _MENU_ data",
             info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
             infoEmpty: "Tidak ada data tahun ajaran",
+            infoFiltered: "(difilter dari _MAX_ total data)",
             zeroRecords: "Data tahun ajaran tidak ditemukan",
             emptyTable: "Belum ada data tahun ajaran",
 
@@ -162,8 +154,31 @@ $(document).ready(function () {
                 previous: "Sebelumnya"
             }
         },
-pageLength: 10,
-        order: [[0, 'asc']]
+
+        pageLength: 10,
+
+        // Urutkan berdasarkan tanggal mulai
+        order: [[3, 'desc']],
+
+        // Kolom No tidak bisa diurutkan atau dicari
+        columnDefs: [
+            {
+                targets: 0,
+                orderable: false,
+                searchable: false
+            }
+        ],
+
+        // Nomor otomatis mengikuti urutan data yang tampil
+        drawCallback: function () {
+            var api = this.api();
+            var info = api.page.info();
+
+            api.column(0, { page: 'current' }).nodes().each(function (cell, i) {
+                cell.innerHTML = info.start + i + 1;
+            });
+        }
+
     });
 
 });

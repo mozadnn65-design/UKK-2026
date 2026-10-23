@@ -275,6 +275,7 @@ $hasil = mysqli_query($koneksi, $sql);
                                     <th>Poin</th>
                                     <th>Tindakan</th>
                                     <th>Status</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
 
@@ -292,6 +293,18 @@ $hasil = mysqli_query($koneksi, $sql);
                                     <td><?php echo (int) $row['poin']; ?></td>
                                     <td><?php echo htmlspecialchars($row['tindakan']); ?></td>
                                     <td><?php echo htmlspecialchars($row['status']); ?></td>
+                                    <td>
+                                        <a href="edit_pelanggaran.php?id=<?php echo $row['id']; ?>"
+                                        class="btn btn-warning btn-sm">
+                                            Edit
+                                        </a>
+
+                                        <a href="hapus_pelanggaran.php?id=<?php echo $row['id']; ?>"
+                                        class="btn btn-danger btn-sm"
+                                        onclick="return confirm('Yakin ingin menghapus pelanggaran ini?')">
+                                            Hapus
+                                        </a>
+                                    </td>
                                 </tr>
                             <?php } ?>
                             </tbody>

@@ -1,253 +1,197 @@
+
 <?php
+// tambah_wali_kelas.php
+include 'includes/cek_session.php';
+include 'config/koneksi.php';
 
-session_start();
-
-include "config/koneksi.php";
-
-// Cek login
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit;
-}
-
-// Hanya admin
-if ($_SESSION['role'] != "admin") {
-    echo "Akses ditolak!";
-    exit;
-}
-
-// Ambil tahun ajaran aktif
+// Ambil data tahun ajaran
 $tahun = mysqli_query(
     $koneksi,
-    "SELECT * FROM t_tahun_ajaran
-     WHERE status_aktif = 1
-     ORDER BY id DESC"
+    "SELECT id, nama FROM t_tahun_ajaran ORDER BY id DESC"
 );
 
-// Ambil kelas aktif
+// Ambil data kelas
 $kelas = mysqli_query(
     $koneksi,
-    "SELECT * FROM t_kelas
-     WHERE status_aktif = 1
-     ORDER BY nama ASC"
+    "SELECT id, nama FROM t_kelas ORDER BY nama ASC"
 );
 
-// Ambil guru aktif
+// Ambil data guru
 $guru = mysqli_query(
     $koneksi,
-    "SELECT * FROM t_guru
-     WHERE status_aktif = 1
-     ORDER BY nama ASC"
+    "SELECT id, nama FROM t_guru ORDER BY nama ASC"
 );
-
-// Jika tombol simpan ditekan
-if (isset($_POST['simpan'])) {
-
-    $tahun_ajaran_id = $_POST['tahun_ajaran_id'];
-    $kelas_id = $_POST['kelas_id'];
-    $guru_id = $_POST['guru_id'];
-    $tanggal_mulai = $_POST['tanggal_mulai'];
-    $tanggal_selesai = $_POST['tanggal_selesai'];
-    $status_aktif = $_POST['status_aktif'];
-
-    $query = mysqli_query($koneksi, "
-        INSERT INTO t_wali_kelas
-        (
-            tahun_ajaran_id,
-            kelas_id,
-            guru_id,
-            tanggal_mulai,
-            tanggal_selesai,
-            status_aktif
-        )
-        VALUES
-        (
-            '$tahun_ajaran_id',
-            '$kelas_id',
-            '$guru_id',
-            '$tanggal_mulai',
-            '$tanggal_selesai',
-            '$status_aktif'
-        )
-    ");
-
-    if ($query) {
-
-        header("Location: kelola_wali_kelas.php");
-        exit;
-
-    } else {
-
-        echo "Data wali kelas gagal ditambahkan.";
-
-    }
-
-}
-
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="id">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Tambah Wali Kelas</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+          rel="stylesheet">
 </head>
 
 <body>
 
-<h2>Tambah Wali Kelas</h2>
+<div class="container-fluid">
+    <div class="row">
 
-<form method="POST">
+        <!-- SIDEBAR -->
+        <?php include 'layout/sidebar.php'; ?>
 
-    Tahun Ajaran:
-    <br>
+        <!-- KONTEN UTAMA -->
+        <main class="col-md-9 col-lg-10 p-4">
 
-    <select name="tahun_ajaran_id" required>
+            <h1 class="mb-4">Tambah Wali Kelas</h1>
 
-        <option value="">
-            -- Pilih Tahun Ajaran --
-        </option>
+            <div class="card shadow-sm">
 
-        <?php
+                <div class="card-header bg-primary text-white">
+                    Form Tambah Wali Kelas
+                </div>
 
-        while ($data_tahun = mysqli_fetch_assoc($tahun)) {
+                <div class="card-body">
 
-        ?>
+                    <form action="proses_tambah_wali_kelas.php"
+                          method="POST"
+                          id="formTambahWaliKelas">
 
-        <option value="<?php echo $data_tahun['id']; ?>">
+                        <!-- TAHUN AJARAN -->
+                        <div class="mb-3">
+                            <label for="tahun_ajaran_id" class="form-label">
+                                Tahun Ajaran
+                            </label>
 
-            <?php echo $data_tahun['nama']; ?>
+                            <select name="tahun_ajaran_id"
+                                    id="tahun_ajaran_id"
+                                    class="form-select"
+                                    required>
 
-        </option>
+                                <option value="">-- Pilih Tahun Ajaran --</option>
 
-        <?php
+                                <?php while ($row = mysqli_fetch_assoc($tahun)) { ?>
+                                    <option value="<?= htmlspecialchars((string)$row['id']) ?>">
+                                        <?= htmlspecialchars($row['nama']) ?>
+                                    </option>
+                                <?php } ?>
 
-        }
+                            </select>
+                        </div>
 
-        ?>
+                        <!-- KELAS -->
+                        <div class="mb-3">
+                            <label for="kelas_id" class="form-label">
+                                Kelas
+                            </label>
 
-    </select>
+                            <select name="kelas_id"
+                                    id="kelas_id"
+                                    class="form-select"
+                                    required>
 
-    <br><br>
+                                <option value="">-- Pilih Kelas --</option>
 
-    Kelas:
-    <br>
+                                <?php while ($row = mysqli_fetch_assoc($kelas)) { ?>
+                                    <option value="<?= htmlspecialchars((string)$row['id']) ?>">
+                                        <?= htmlspecialchars($row['nama']) ?>
+                                    </option>
+                                <?php } ?>
 
-    <select name="kelas_id" required>
+                            </select>
+                        </div>
 
-        <option value="">
-            -- Pilih Kelas --
-        </option>
+                        <!-- GURU -->
+                        <div class="mb-3">
+                            <label for="guru_id" class="form-label">
+                                Guru
+                            </label>
 
-        <?php
+                            <select name="guru_id"
+                                    id="guru_id"
+                                    class="form-select"
+                                    required>
 
-        while ($data_kelas = mysqli_fetch_assoc($kelas)) {
+                                <option value="">-- Pilih Guru --</option>
 
-        ?>
+                                <?php while ($row = mysqli_fetch_assoc($guru)) { ?>
+                                    <option value="<?= htmlspecialchars((string)$row['id']) ?>">
+                                        <?= htmlspecialchars($row['nama']) ?>
+                                    </option>
+                                <?php } ?>
 
-        <option value="<?php echo $data_kelas['id']; ?>">
+                            </select>
+                        </div>
 
-            <?php echo $data_kelas['nama']; ?>
-            -
-            <?php echo $data_kelas['tingkat']; ?>
-            <?php echo $data_kelas['jurusan']; ?>
+                        <!-- TANGGAL MULAI -->
+                        <div class="mb-3">
+                            <label for="tanggal_mulai" class="form-label">
+                                Tanggal Mulai
+                            </label>
 
-        </option>
+                            <input type="date"
+                                   name="tanggal_mulai"
+                                   id="tanggal_mulai"
+                                   class="form-control"
+                                   required>
+                        </div>
 
-        <?php
+                        <!-- TANGGAL SELESAI -->
+                        <div class="mb-3">
+                            <label for="tanggal_selesai" class="form-label">
+                                Tanggal Selesai
+                            </label>
 
-        }
+                            <input type="date"
+                                   name="tanggal_selesai"
+                                   id="tanggal_selesai"
+                                   class="form-control"
+                                   required>
+                        </div>
 
-        ?>
+                        <!-- STATUS -->
+                        <div class="mb-4">
+                            <label for="status_aktif" class="form-label">
+                                Status
+                            </label>
 
-    </select>
+                            <select name="status_aktif"
+                                    id="status_aktif"
+                                    class="form-select"
+                                    required>
 
-    <br><br>
+                                <option value="1">Aktif</option>
+                                <option value="0">Tidak Aktif</option>
 
-    Guru / Wali Kelas:
-    <br>
+                            </select>
+                        </div>
 
-    <select name="guru_id" required>
+                        <!-- TOMBOL -->
+                        <button type="submit" class="btn btn-primary">
+                            Simpan Wali Kelas
+                        </button>
 
-        <option value="">
-            -- Pilih Guru --
-        </option>
+                        <a href="kelola_wali_kelas.php"
+                           class="btn btn-secondary">
+                            Kembali
+                        </a>
 
-        <?php
+                    </form>
 
-        while ($data_guru = mysqli_fetch_assoc($guru)) {
+                </div>
+            </div>
 
-        ?>
+        </main>
 
-        <option value="<?php echo $data_guru['id']; ?>">
+    </div>
+</div>
 
-            <?php echo $data_guru['nip']; ?>
-            -
-            <?php echo $data_guru['nama']; ?>
-
-        </option>
-
-        <?php
-
-        }
-
-        ?>
-
-    </select>
-
-    <br><br>
-
-    Tanggal Mulai:
-    <br>
-
-    <input
-        type="date"
-        name="tanggal_mulai"
-        required
-    >
-
-    <br><br>
-
-    Tanggal Selesai:
-    <br>
-
-    <input
-        type="date"
-        name="tanggal_selesai"
-        required
-    >
-
-    <br><br>
-
-    Status:
-    <br>
-
-    <select name="status_aktif">
-
-        <option value="1">
-            Aktif
-        </option>
-
-        <option value="0">
-            Tidak Aktif
-        </option>
-
-    </select>
-
-    <br><br>
-
-    <button type="submit" name="simpan">
-        Simpan
-    </button>
-
-    <br><br>
-
-    <a href="kelola_wali_kelas.php">
-        Kembali
-    </a>
-
-</form>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
-
 </html>

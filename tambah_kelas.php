@@ -1,109 +1,118 @@
+
 <?php
-
-session_start();
-
-include "config/koneksi.php";
-
-// Cek login
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit;
-}
-
-// Cek admin
-if ($_SESSION['role'] != "admin") {
-    echo "Akses ditolak!";
-    exit;
-}
-
-// Proses simpan
-if (isset($_POST['simpan'])) {
-
-    $nama = $_POST['nama'];
-    $tingkat = $_POST['tingkat'];
-    $jurusan = $_POST['jurusan'];
-    $status_aktif = $_POST['status_aktif'];
-
-    $query = mysqli_query($koneksi, "INSERT INTO t_kelas
-        (nama, tingkat, jurusan, status_aktif)
-        VALUES
-        ('$nama', '$tingkat', '$jurusan', '$status_aktif')");
-
-    if ($query) {
-
-        header("Location: kelola_kelas.php");
-        exit;
-
-    } else {
-
-        echo "Data kelas gagal ditambahkan.";
-
-    }
-
-}
-
+// tambah_kelas.php
+include 'includes/cek_session.php';
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="id">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Tambah Kelas</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+          rel="stylesheet">
 </head>
 
 <body>
 
-<h2>Tambah Kelas</h2>
+<div class="container-fluid">
+    <div class="row">
 
-<form method="POST">
+        <!-- SIDEBAR -->
+        <?php include 'layout/sidebar.php'; ?>
 
-    Nama Kelas:
-    <br>
-    <input type="text" name="nama" required>
+        <!-- KONTEN UTAMA -->
+        <main class="col-md-9 col-lg-10 p-4">
 
-    <br><br>
+            <h1 class="mb-4">Tambah Kelas</h1>
 
-    Tingkat:
-    <br>
-    <input type="text" name="tingkat" required>
+            <div class="card shadow-sm">
 
-    <br><br>
+                <div class="card-header bg-primary text-white">
+                    Form Tambah Kelas
+                </div>
 
-    Jurusan:
-    <br>
-    <input type="text" name="jurusan" required>
+                <div class="card-body">
 
-    <br><br>
+                    <form action="proses_tambah_kelas.php"
+                          method="POST"
+                          id="formTambahKelas">
 
-    Status:
-    <br>
+                        <div class="mb-3">
+                            <label for="nama" class="form-label">
+                                Nama Kelas
+                            </label>
 
-    <select name="status_aktif">
+                            <input type="text"
+                                   name="nama"
+                                   id="nama"
+                                   class="form-control"
+                                   required>
+                        </div>
 
-        <option value="1">
-            Aktif
-        </option>
+                        <div class="mb-3">
+                            <label for="tingkat" class="form-label">
+                                Tingkat
+                            </label>
 
-        <option value="0">
-            Tidak Aktif
-        </option>
+                            <input type="text"
+                                   name="tingkat"
+                                   id="tingkat"
+                                   class="form-control"
+                                   required>
+                        </div>
 
-    </select>
+                        <div class="mb-3">
+                            <label for="jurusan" class="form-label">
+                                Jurusan
+                            </label>
 
-    <br><br>
+                            <input type="text"
+                                   name="jurusan"
+                                   id="jurusan"
+                                   class="form-control"
+                                   required>
+                        </div>
 
-    <button type="submit" name="simpan">
-        Simpan
-    </button>
+                        <div class="mb-4">
+                            <label for="status_aktif" class="form-label">
+                                Status Aktif
+                            </label>
 
-    <br><br>
+                            <select name="status_aktif"
+                                    id="status_aktif"
+                                    class="form-select"
+                                    required>
+                                <option value="1">Aktif</option>
+                                <option value="0">Tidak Aktif</option>
+                            </select>
+                        </div>
 
-    <a href="kelola_kelas.php">
-        Kembali
-    </a>
+                        <button type="submit" class="btn btn-primary">
+                            Simpan Kelas
+                        </button>
 
-</form>
+                        <a href="kelola_kelas.php"
+                           class="btn btn-secondary">
+                            Kembali
+                        </a>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </main>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
-
 </html>

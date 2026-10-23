@@ -1,41 +1,156 @@
+
 <?php
-include "config/koneksi.php";
+// edit_tahun_ajaran.php
+include 'includes/cek_session.php';
+include 'config/koneksi.php';
 
-$id = $_GET['id'];
-$data = mysqli_query($koneksi, "SELECT * FROM t_tahun_ajaran WHERE id='$id'");
-$tahun = mysqli_fetch_assoc($data);
+if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+    die("ID tahun ajaran tidak valid.");
+}
 
-if (isset($_POST['update'])) {
-    mysqli_query($koneksi, "UPDATE t_tahun_ajaran SET
-        nama='$_POST[nama]',
-        tanggal_mulai='$_POST[mulai]',
-        tanggal_selesai='$_POST[selesai]',
-        status_aktif='$_POST[status]'
-        WHERE id='$id'");
+$id = (int) $_GET['id'];
 
-    header("Location: kelola_tahun_ajaran.php");
+$stmt = mysqli_prepare(
+    $koneksi,
+    "SELECT * FROM t_tahun_ajaran WHERE id = ?"
+);
+
+mysqli_stmt_bind_param($stmt, "i", $id);
+mysqli_stmt_execute($stmt);
+
+$hasil = mysqli_stmt_get_result($stmt);
+$data = mysqli_fetch_assoc($hasil);
+
+if (!$data) {
+    die("Data tahun ajaran tidak ditemukan.");
 }
 ?>
 
-<h2>Edit Tahun Ajaran</h2>
+<!DOCTYPE html>
+<html lang="id">
 
-<form method="POST">
-Nama: <input name="nama" value="<?php echo $tahun['nama']; ?>"><br><br>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-Mulai:
-<input type="date" name="mulai" value="<?php echo $tahun['tanggal_mulai']; ?>"><br><br>
+    <title>Edit Tahun Ajaran</title>
 
-Selesai:
-<input type="date" name="selesai" value="<?php echo $tahun['tanggal_selesai']; ?>"><br><br>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+</head>
 
-Status:
-<select name="status">
-    <option value="1">Aktif</option>
-    <option value="0">Tidak Aktif</option>
-</select>
+<body>
 
-<br><br>
-<button name="update">Update</button>
-</form>
+<div class="container-fluid">
+    <div class="row">
 
-<a href="kelola_tahun_ajaran.php">Kembali</a>
+        <!-- SIDEBAR -->
+        <?php include 'layout/sidebar.php'; ?>
+
+        <!-- KONTEN UTAMA -->
+        <main class="col-md-9 col-lg-10 p-4">
+
+            <h1 class="mb-4">Edit Tahun Ajaran</h1>
+
+            <div class="card shadow-sm">
+
+                <div class="card-header bg-primary text-white">
+                    Form Edit Tahun Ajaran
+                </div>
+
+                <div class="card-body">
+
+                    <form action="proses_edit_tahun_ajaran.php"
+                          method="POST"
+                          id="formEditTahunAjaran">
+
+                        <input type="hidden"
+                               name="id"
+                               value="<?= htmlspecialchars((string)$data['id']) ?>">
+
+                        <div class="mb-3">
+                            <label for="nama" class="form-label">
+                                Nama Tahun Ajaran
+                            </label>
+
+                            <input type="text"
+                                   name="nama"
+                                   id="nama"
+                                   class="form-control"
+                                   value="<?= htmlspecialchars($data['nama'] ?? '') ?>"
+                                   required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="tanggal_mulai" class="form-label">
+                                Tanggal Mulai
+                            </label>
+
+                            <input type="date"
+                                   name="tanggal_mulai"
+                                   id="tanggal_mulai"
+                                   class="form-control"
+                                   value="<?= htmlspecialchars($data['tanggal_mulai'] ?? '') ?>"
+                                   required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="tanggal_selesai" class="form-label">
+                                Tanggal Selesai
+                            </label>
+
+                            <input type="date"
+                                   name="tanggal_selesai"
+                                   id="tanggal_selesai"
+                                   class="form-control"
+                                   value="<?= htmlspecialchars($data['tanggal_selesai'] ?? '') ?>"
+                                   required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="status_aktif" class="form-label">
+                                Status Aktif
+                            </label>
+
+                            <select name="status_aktif"
+                                    id="status_aktif"
+                                    class="form-select"
+                                    required>
+
+                                <option value="1"
+                                    <?= $data['status_aktif'] == 1 ? 'selected' : '' ?>>
+                                    Aktif
+                                </option>
+
+                                <option value="0"
+                                    <?= $data['status_aktif'] == 0 ? 'selected' : '' ?>>
+                                    Tidak Aktif
+                                </option>
+
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            Update Tahun Ajaran
+                        </button>
+
+                        <a href="kelola_tahun_ajaran.php"
+                           class="btn btn-secondary">
+                            Kembali
+                        </a>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </main>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

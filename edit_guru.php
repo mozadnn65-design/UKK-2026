@@ -1,39 +1,136 @@
+
 <?php
-include "config/koneksi.php";
+// edit_guru.php
+include 'includes/cek_session.php';
+include 'config/koneksi.php';
 
-$id = $_GET['id'];
-$data = mysqli_query($koneksi, "SELECT * FROM t_guru WHERE id='$id'");
-$guru = mysqli_fetch_assoc($data);
+if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+    die("ID guru tidak valid.");
+}
 
-if (isset($_POST['update'])) {
-    mysqli_query($koneksi, "UPDATE t_guru SET
-        nip='$_POST[nip]',
-        nama='$_POST[nama]',
-        email='$_POST[email]',
-        status_aktif='$_POST[status]',
-        updated_at=now()
-        WHERE id='$id'");
+$id = (int) $_GET['id'];
 
-    header("Location: kelola_guru.php");
+$stmt = mysqli_prepare($koneksi, "SELECT * FROM t_guru WHERE id = ?");
+mysqli_stmt_bind_param($stmt, "i", $id);
+mysqli_stmt_execute($stmt);
+
+$hasil = mysqli_stmt_get_result($stmt);
+$data = mysqli_fetch_assoc($hasil);
+
+if (!$data) {
+    die("Data guru tidak ditemukan.");
 }
 ?>
 
-<h2>Edit Guru</h2>
+<!DOCTYPE html>
+<html lang="id">
 
-<form method="POST">
-NIP: <input name="nip" value="<?php echo $guru['nip']; ?>"><br><br>
-Nama: <input name="nama" value="<?php echo $guru['nama']; ?>"><br><br>
-Email: <input name="email" value="<?php echo $guru['email']; ?>"><br><br>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <title>Edit Guru</title>
 
-Status:
-<select name="status">
-    <option value="1">Aktif</option>
-    <option value="0">Tidak Aktif</option>
-</select>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+</head>
 
-<br><br>
-<button name="update">Update</button>
-</form>
+<body>
 
-<a href="kelola_guru.php">Kembali</a>
+<div class="container-fluid">
+    <div class="row">
+
+        <!-- SIDEBAR -->
+        <?php include 'layout/sidebar.php'; ?>
+
+        <!-- KONTEN UTAMA -->
+        <main class="col-md-9 col-lg-10 p-4">
+
+            <h1 class="mb-4">Edit Guru</h1>
+
+            <div class="card shadow-sm">
+
+                <div class="card-header bg-primary text-white">
+                    Form Edit Guru
+                </div>
+
+                <div class="card-body">
+
+                    <form action="proses_edit_guru.php"
+                          method="POST"
+                          id="formEditGuru">
+
+                        <input type="hidden"
+                               name="id"
+                               value="<?= htmlspecialchars($data['id']) ?>">
+
+                        <div class="mb-3">
+                            <label class="form-label">NIP</label>
+                            <input type="text"
+                                   name="nip"
+                                   class="form-control"
+                                   value="<?= htmlspecialchars($data['nip'] ?? '') ?>"
+                                   required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Nama Guru</label>
+                            <input type="text"
+                                   name="nama"
+                                   class="form-control"
+                                   value="<?= htmlspecialchars($data['nama'] ?? '') ?>"
+                                   required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email"
+                                   name="email"
+                                   class="form-control"
+                                   value="<?= htmlspecialchars($data['email'] ?? '') ?>"
+                                   required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Status Aktif</label>
+                            <select name="status_aktif"
+                                    class="form-select"
+                                    required>
+
+                                <option value="1"
+                                    <?= $data['status_aktif'] == 1 ? 'selected' : '' ?>>
+                                    Aktif
+                                </option>
+
+                                <option value="0"
+                                    <?= $data['status_aktif'] == 0 ? 'selected' : '' ?>>
+                                    Tidak Aktif
+                                </option>
+
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            Update Guru
+                        </button>
+
+                        <a href="kelola_guru.php"
+                           class="btn btn-secondary">
+                            Kembali
+                        </a>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </main>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

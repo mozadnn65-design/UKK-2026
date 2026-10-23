@@ -1,113 +1,129 @@
 
 <?php
-
-session_start();
-
-include "config/koneksi.php";
-
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit;
-}
-
-if ($_SESSION['role'] != "admin") {
-    echo "Akses ditolak!";
-    exit;
-}
-
-if (isset($_POST['simpan'])) {
-
-    $user_id = $_SESSION['user_id'];
-    $nip = $_POST['nip'];
-    $nama = $_POST['nama'];
-    $email = $_POST['email'];
-    $status = $_POST['status_aktif'];
-
-    $stmt = mysqli_prepare($koneksi, "INSERT INTO t_guru
-        (user_id, nip, nama, email, status_aktif, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, NOW(), NOW())");
-
-    mysqli_stmt_bind_param(
-        $stmt,
-        "issss",
-        $user_id,
-        $nip,
-        $nama,
-        $email,
-        $status
-    );
-
-    $query = mysqli_stmt_execute($stmt);
-
-    if ($query) {
-
-        header("Location: kelola_guru.php");
-        exit;
-
-    } else {
-
-        echo "Data guru gagal ditambahkan.";
-
-    }
-
-    mysqli_stmt_close($stmt);
-}
-
+// tambah_guru.php
+include 'includes/cek_session.php';
 ?>
 
 <!DOCTYPE html>
-<html>
-
+<html lang="id">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tambah Guru</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body>
 
-<h2>Tambah Guru</h2>
+<div class="container-fluid">
+    <div class="row">
 
-<form method="POST">
+        <?php include 'layout/sidebar.php'; ?>
 
-    NIP:
-    <br>
-    <input type="text" name="nip" required>
+        <main class="col-md-9 col-lg-10 p-4">
 
-    <br><br>
+            <h2>Tambah Guru</h2>
 
-    Nama:
-    <br>
-    <input type="text" name="nama" required>
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    Form Tambah Guru
+                </div>
 
-    <br><br>
+                <div class="card-body">
 
-    Email:
-    <br>
-    <input type="email" name="email" required>
+                    <form action="proses_tambah_guru.php" method="POST"
+                          autocomplete="off" onsubmit="return cekForm()">
 
-    <br><br>
+                        <div class="mb-3">
+                            <label class="form-label">NIP</label>
+                            <input type="text" name="nip" id="nip"
+                                   class="form-control"
+                                   maxlength="18" inputmode="numeric" required>
+                            <small>NIP harus berupa angka, maksimal 18 digit.</small>
+                        </div>
 
-    Status:
-    <br>
+                        <div class="mb-3">
+                            <label class="form-label">Nama Guru</label>
+                            <input type="text" name="nama"
+                                   class="form-control" required>
+                        </div>
 
-    <select name="status_aktif">
-        <option value="aktif">Aktif</option>
-        <option value="tidak aktif">Tidak Aktif</option>
-    </select>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email"
+                                   class="form-control"
+                                   autocomplete="off"
+                                   value=""
+                                   placeholder="Ketik email sendiri"
+                                   required>
+                        </div>
 
-    <br><br>
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            <input type="password" name="password"
+                                   id="password" class="form-control"
+                                   autocomplete="new-password"
+                                   value=""
+                                   placeholder="Ketik password sendiri"
+                                   required>
+                        </div>
 
-    <button type="submit" name="simpan">
-        Simpan
-    </button>
+                        <div class="mb-3">
+                            <label class="form-label">Konfirmasi Password</label>
+                            <input type="password" name="konfirmasi_password"
+                                   id="konfirmasi_password"
+                                   class="form-control"
+                                   autocomplete="new-password"
+                                   value=""
+                                   placeholder="Ketik ulang password"
+                                   required>
+                        </div>
 
-    <br><br>
+                        <div class="mb-3">
+                            <label class="form-label">Status Aktif</label>
+                            <select name="status_aktif" class="form-select" required>
+                                <option value="1">Aktif</option>
+                                <option value="0">Tidak Aktif</option>
+                            </select>
+                        </div>
 
-    <a href="kelola_guru.php">Kembali</a>
+                        <button type="submit" class="btn btn-primary">
+                            Simpan Guru
+                        </button>
 
-    <br><br>
+                        <a href="kelola_guru.php" class="btn btn-secondary">
+                            Kembali
+                        </a>
 
-</form>
+                    </form>
+
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<script>
+function cekForm() {
+    var nip = document.getElementById('nip').value;
+    var password = document.getElementById('password').value;
+    var konfirmasi = document.getElementById('konfirmasi_password').value;
+
+    if (!/^[0-9]+$/.test(nip) || nip.length > 18) {
+        alert('NIP harus berupa angka dan maksimal 18 digit!');
+        return false;
+    }
+
+    if (password != konfirmasi) {
+        alert('Password tidak sama!');
+        return false;
+    }
+
+    return true;
+}
+</script>
 
 </body>
-
 </html>

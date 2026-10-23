@@ -1,3 +1,4 @@
+
 <?php
 // kelola_kelas.php
 
@@ -37,7 +38,25 @@ $hasil = mysqli_query($koneksi, $sql);
         <main class="col-md-9 col-lg-10 p-4">
 
             <h2 class="mb-4">Kelola Kelas</h2>
+          <?php
+            if (isset($_SESSION['pesan_sukses'])) {
+                echo '<div class="alert alert-success alert-dismissible fade show" role="alert">';
+                echo $_SESSION['pesan_sukses'];
+                echo '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+                echo '</div>';
 
+                unset($_SESSION['pesan_sukses']);
+            }
+
+            if (isset($_SESSION['pesan_error'])) {
+                echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
+                echo $_SESSION['pesan_error'];
+                echo '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+                echo '</div>';
+
+                unset($_SESSION['pesan_error']);
+            }
+            ?>
             <!-- Tombol Navigasi -->
             <div class="mb-3">
                 <a href="dashboard.php" class="btn btn-secondary">
@@ -83,7 +102,6 @@ $hasil = mysqli_query($koneksi, $sql);
                             <thead class="table-dark">
                                 <tr>
                                     <th>No</th>
-                                    <th>ID</th>
                                     <th>Nama Kelas</th>
                                     <th>Tingkat</th>
                                     <th>Jurusan</th>
@@ -103,8 +121,6 @@ $hasil = mysqli_query($koneksi, $sql);
                                 ?>
                                     <tr>
                                         <td><?= $no++; ?></td>
-
-                                        <td><?= (int) $row['id']; ?></td>
 
                                         <td>
                                             <?= htmlspecialchars($row['nama'] ?? ''); ?>
@@ -200,12 +216,12 @@ $(document).ready(function () {
         lengthMenu: [5, 10, 25, 50, 100],
 
         // Urutkan berdasarkan nama kelas
-        order: [[2, 'asc']],
+        order: [[1, 'asc']],
 
         // Kolom aksi tidak bisa diurutkan atau dicari
         columnDefs: [
             {
-                targets: 8,
+                targets: 7,
                 orderable: false,
                 searchable: false
             }

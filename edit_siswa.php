@@ -1,58 +1,128 @@
-<?php
-include "config/koneksi.php";
 
+<?php
+// edit_siswa.php
+include 'includes/cek_session.php';
+include 'config/koneksi.php';
+
+// Ambil ID siswa dari URL
 $id = $_GET['id'];
+
+// Ambil data siswa dari database
 $data = mysqli_query($koneksi, "SELECT * FROM t_siswa WHERE id='$id'");
 $siswa = mysqli_fetch_assoc($data);
-
-if (isset($_POST['update'])) {
-    mysqli_query($koneksi, "UPDATE t_siswa SET
-        nis='$_POST[nis]',
-        nisn='$_POST[nisn]',
-        nama='$_POST[nama]',
-        jenis_kelamin='$_POST[jk]',
-        tanggal_lahir='$_POST[tgl]',
-        alamat='$_POST[alamat]',
-        status_aktif='$_POST[status]'
-        WHERE id='$id'");
-
-    header("Location: kelola_siswa.php");
-}
 ?>
 
-<h2>Edit Siswa</h2>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Siswa</title>
 
-<form method="POST">
-NIS: <input name="nis" value="<?php echo $siswa['nis']; ?>"><br><br>
-NISN: <input name="nisn" value="<?php echo $siswa['nisn']; ?>"><br><br>
-Nama: <input name="nama" value="<?php echo $siswa['nama']; ?>"><br><br>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
 
-Jenis Kelamin:
-<select name="jk">
-    <option value="L">Laki-laki</option>
-    <option value="P">Perempuan</option>
-</select>
+<body>
+<div class="container-fluid">
+    <div class="row">
 
-<br><br>
+        <?php include 'layout/sidebar.php'; ?>
 
-Tanggal Lahir:
-<input type="date" name="tgl" value="<?php echo $siswa['tanggal_lahir']; ?>">
+        <main class="col-md-9 col-lg-10 p-4">
 
-<br><br>
+            <h2>Edit Siswa</h2>
 
-Alamat:
-<textarea name="alamat"><?php echo $siswa['alamat']; ?></textarea>
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    Form Edit Siswa
+                </div>
 
-<br><br>
+                <div class="card-body">
 
-Status:
-<select name="status">
-    <option value="1">Aktif</option>
-    <option value="0">Tidak Aktif</option>
-</select>
+                    <form action="proses_edit_siswa.php" method="POST">
 
-<br><br>
-<button name="update">Update</button>
-</form>
+                        <input type="hidden" name="id"
+                               value="<?= $siswa['id']; ?>">
 
-<a href="kelola_siswa.php">Kembali</a>
+                        <div class="mb-3">
+                            <label class="form-label">NIS</label>
+                            <input type="text" name="nis"
+                                   class="form-control" maxlength="10"
+                                   value="<?= $siswa['nis']; ?>" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">NISN</label>
+                            <input type="text" name="nisn"
+                                   class="form-control" maxlength="10"
+                                   value="<?= $siswa['nisn']; ?>" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Nama Siswa</label>
+                            <input type="text" name="nama"
+                                   class="form-control"
+                                   value="<?= $siswa['nama']; ?>" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Jenis Kelamin</label>
+                            <select name="jenis_kelamin" class="form-select" required>
+                                <option value="L"
+                                    <?= $siswa['jenis_kelamin'] == 'L' ? 'selected' : ''; ?>>
+                                    Laki-laki
+                                </option>
+
+                                <option value="P"
+                                    <?= $siswa['jenis_kelamin'] == 'P' ? 'selected' : ''; ?>>
+                                    Perempuan
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Tanggal Lahir</label>
+                            <input type="date" name="tanggal_lahir"
+                                   class="form-control"
+                                   value="<?= $siswa['tanggal_lahir']; ?>" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Alamat</label>
+                            <textarea name="alamat" class="form-control"
+                                      required><?= $siswa['alamat']; ?></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Status Aktif</label>
+                            <select name="status_aktif" class="form-select" required>
+                                <option value="1"
+                                    <?= $siswa['status_aktif'] == 1 ? 'selected' : ''; ?>>
+                                    Aktif
+                                </option>
+
+                                <option value="0"
+                                    <?= $siswa['status_aktif'] == 0 ? 'selected' : ''; ?>>
+                                    Tidak Aktif
+                                </option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            Simpan Perubahan
+                        </button>
+
+                        <a href="kelola_siswa.php" class="btn btn-secondary">
+                            Kembali
+                        </a>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+</body>
+</html>

@@ -1,102 +1,91 @@
-<?php
 
+<?php
 session_start();
 
-// Jika sudah login, langsung ke dashboard
 if (isset($_SESSION['user_id'])) {
     header("Location: dashboard.php");
     exit;
 }
-
 ?>
 
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-B/GM4XqrwHnWXNOWMbloTmrYXZg10cakYGmpfsR/bbzQ6JAJI4ihuyADKLnBgrCe" crossorigin="anonymous">
-<script type="module" src="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-1a/pXj49ZQ1aHEmrJ+gMw1otqoVsYwlEnlD8mIfY2TV03r20Y0CN7uqx1tQogjPL" crossorigin="anonymous"></script>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login Pelanggaran Siswa</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+          rel="stylesheet">
 </head>
 
-<body>
-    <script type="importmap">
-{
-  "imports": {
-    "@floating-ui/dom": "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.7.6/dist/floating-ui.dom.esm.min.js",
-    "vanilla-calendar-pro": "https://cdn.jsdelivr.net/npm/vanilla-calendar-pro@3.4.0/index.mjs"
-  }
-}
-</script>
-<script type="module" src="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/js/bootstrap.min.js" integrity="sha384-BJf/nQgxZJU68GxBse97Vdlc8Rh+z9PzzXiS3/BjV+1nQPR7IKn+iJnD3DJvCMaU" crossorigin="anonymous"></script>
+<body class="bg-light">
 
-    <h1>Login Aplikasi Pelanggaran Siswa</h1>
+<div class="container min-vh-100 d-flex justify-content-center align-items-center">
 
-    <?php
+    <div class="card shadow-sm border w-100" style="max-width: 400px;">
 
-    if (isset($_SESSION['pesan_error'])) {
+        <div class="card-header bg-primary text-white text-center py-3">
+            <h4 class="mb-1">Pelanggaran Siswa</h4>
+            <small>Aplikasi Manajemen Pelanggaran Siswa</small>
+        </div>
 
-        echo "<p>" . htmlspecialchars($_SESSION['pesan_error']) . "</p>";
+        <div class="card-body p-4">
 
-        unset($_SESSION['pesan_error']);
-    }
+            <h5 class="text-center mb-4">Login</h5>
 
-    ?>
-<!-- 
-    <form action="proses_login.php" method="POST" autocomplete="off">
+            <?php if (isset($_SESSION['pesan_error'])) { ?>
+                <div class="alert alert-danger" role="alert">
+                    <?php
+                    echo htmlspecialchars($_SESSION['pesan_error']);
+                    unset($_SESSION['pesan_error']);
+                    ?>
+                </div>
+            <?php } ?>
 
-        <table>
+            <form action="proses_login.php"
+                  method="POST"
+                  autocomplete="off">
 
-            <tr>
-                <td>Email</td>
-                <td>:</td>
-                <td>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
                     <input
                         type="email"
                         name="email"
-                        value=""
+                        id="email"
+                        class="form-control"
+                        placeholder="Masukkan email"
                         autocomplete="off"
                         required>
-                </td>
-            </tr>
+                </div>
 
-            <tr>
-                <td>Password</td>
-                <td>:</td>
-                <td>
+                <div class="mb-4">
+                    <label for="password" class="form-label">Password</label>
                     <input
                         type="password"
                         name="password"
-                        value=""
+                        id="password"
+                        class="form-control"
+                        placeholder="Masukkan password"
                         autocomplete="new-password"
                         required>
-                </td>
-            </tr>
+                </div>
 
-            <tr>
-                <td colspan="3">
-                    <input type="submit" value="Login">
-                </td>
-            </tr>
+                <button type="submit" class="btn btn-primary w-100">
+                    Login
+                </button>
 
-        </table>
+            </form>
 
-    </form> -->
+        </div>
 
-<form action="proses_login.php" method="POST" autocomplete="off">
-  <div class="form-group">
-    <label for="exampleInputEmail1">Email</label>
-    <input type="email" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
-  </div>
-  <div class="form-group">
-    <label for="exampleInputPassword1">Password</label>
-    <input type="password" name="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
-  </div>
+        <div class="card-footer text-center text-secondary py-3">
+            <small>Silakan masuk menggunakan akun Anda</small>
+        </div>
 
-  <button type="submit" class="btn btn-primary">Login</button>
-</form>
+    </div>
+
+</div>
 
 </body>
-
 </html>
