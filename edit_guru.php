@@ -91,6 +91,27 @@ if (!$data) {
                                    value="<?= htmlspecialchars($data['email'] ?? '') ?>"
                                    required>
                         </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            <input type="password" name="password"
+                                   id="password" class="form-control"
+                                   autocomplete="new-password"
+                                   value=""
+                                   placeholder="Ketik password sendiri"
+                                   required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Konfirmasi Password</label>
+                            <input type="password" name="konfirmasi_password"
+                                   id="konfirmasi_password"
+                                   class="form-control"
+                                   autocomplete="new-password"
+                                   value=""
+                                   placeholder="Ketik ulang password"
+                                   required>
+                        </div>
 
                         <div class="mb-3">
                             <label class="form-label">Status Aktif</label>

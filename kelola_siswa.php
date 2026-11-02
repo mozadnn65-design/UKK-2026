@@ -68,6 +68,10 @@ $hasil = mysqli_query($koneksi, $sql);
 
             <!-- TABEL DATA SISWA -->
             <div class="card shadow-sm">
+
+            <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Daftar Siswa</h5>
+                </div>
                 <div class="card-body">
 
                     <div class="table-responsive">

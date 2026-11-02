@@ -36,7 +36,7 @@ $hasil = mysqli_query($koneksi, $sql);
 
         <main class="col-md-9 col-lg-10 p-4">
 
-            <h2 class="mb-3">Penempatan Siswa</h2>
+            <h2 class="mb-4">Penempatan Siswa</h2>
 
             <?php if (isset($_SESSION['pesan_sukses'])) { ?>
                 <div class="alert alert-success">
@@ -60,8 +60,8 @@ $hasil = mysqli_query($koneksi, $sql);
             </div>
 
             <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    Data Penempatan Siswa
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Daftar penempatan Siswa</h5>
                 </div>
 
                 <div class="card-body table-responsive">
@@ -79,7 +79,7 @@ $hasil = mysqli_query($koneksi, $sql);
                                 <th>Jurusan</th>
                                 <th>Tanggal Mulai</th>
                                 <th>Tanggal Selesai</th>
-                                <th>Status</th>
+                                <th>Status Aktif</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>

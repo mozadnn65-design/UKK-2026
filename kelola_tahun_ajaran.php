@@ -29,8 +29,7 @@ $hasil = mysqli_query($koneksi, $sql);
 
         <main class="col-md-9 col-lg-10 p-4">
 
-            <h2>Kelola Tahun Ajaran</h2>
-            <p>Selamat datang di halaman Tahun Ajaran.</p>
+            <h2 class="mb-4">Kelola Tahun Ajaran</h2>
           <?php
             if (isset($_SESSION['pesan_sukses'])) {
                 echo '<div class="alert alert-success alert-dismissible fade show" role="alert">';
@@ -61,6 +60,9 @@ $hasil = mysqli_query($koneksi, $sql);
             </div>
 
             <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Daftar Tahun Ajaran</h5>
+                </div>
                 <div class="card-body">
 
                     <div class="table-responsive">

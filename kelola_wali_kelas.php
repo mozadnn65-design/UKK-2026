@@ -41,8 +41,7 @@ $hasil = mysqli_query($koneksi, $sql);
 
         <main class="col-md-9 col-lg-10 p-4">
 
-            <h2>Kelola Wali Kelas</h2>
-            <p>Selamat datang di halaman Wali Kelas.</p>
+            <h2 class="mb-4">Kelola Wali Kelas</h2>
           <?php
             if (isset($_SESSION['pesan_sukses'])) {
                 echo '<div class="alert alert-success alert-dismissible fade show" role="alert">';
@@ -73,6 +72,9 @@ $hasil = mysqli_query($koneksi, $sql);
             </div>
 
             <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Daftar Wali Kelas</h5>
+                </div>
                 <div class="card-body">
 
                     <div class="table-responsive">
@@ -87,7 +89,7 @@ $hasil = mysqli_query($koneksi, $sql);
                                     <th>Guru</th>
                                     <th>Tanggal Mulai</th>
                                     <th>Tanggal Selesai</th>
-                                    <th>Status</th>
+                                    <th>Status Aktif</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
