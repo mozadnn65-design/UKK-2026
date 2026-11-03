@@ -98,7 +98,6 @@ $hasil = mysqli_query($koneksi, $sql);
                             <thead class="table-dark">
                                 <tr>
                                     <th>No</th>
-                                    <th>ID</th>
                                     <th>Nama Kategori</th>
                                     <th>Deskripsi</th>
                                     <th>Status Aktif</th>
@@ -117,8 +116,6 @@ $hasil = mysqli_query($koneksi, $sql);
                                 ?>
                                     <tr>
                                         <td><?= $no++; ?></td>
-
-                                        <td><?= (int) $row['id']; ?></td>
 
                                         <td>
                                             <?= htmlspecialchars($row['nama'] ?? ''); ?>
@@ -204,24 +201,12 @@ $(document).ready(function () {
                 previous: "Sebelumnya"
             }
         },
-
         pageLength: 10,
-        lengthMenu: [5, 10, 25, 50, 100],
-
-        // Urutkan berdasarkan ID terbesar
-        order: [[1, 'desc']],
-
-        // Kolom aksi tidak bisa diurutkan atau dicari
-        columnDefs: [
-            {
-                targets: 7,
-                orderable: false,
-                searchable: false
-            }
-        ]
-    });
-});
+        lengthMenu: [5, 10, 25, 50, 100]
+    }); // <-- Pastikan ditutup dengan tanda ini
+}); // <-- Dan ditutup dengan tanda ini
 </script>
+
 
 </body>
 </html>

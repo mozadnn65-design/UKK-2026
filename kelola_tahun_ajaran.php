@@ -55,7 +55,7 @@ $hasil = mysqli_query($koneksi, $sql);
                 </a>
 
                 <a href="tambah_tahun_ajaran.php" class="btn btn-primary">
-                    Tambah Tahun Ajaran
+                    + Tambah Tahun Ajaran
                 </a>
             </div>
 

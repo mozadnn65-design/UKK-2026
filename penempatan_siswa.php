@@ -53,7 +53,7 @@ $hasil = mysqli_query($koneksi, $sql);
             <?php } ?>
 
             <div class="mb-3">
-                <a href="dashboard.php" class="btn btn-secondary">Kembali</a>
+                <a href="dashboard.php" class="btn btn-secondary">Kembali ke Dashboard</a>
                 <a href="tambah_penempatan_siswa.php" class="btn btn-primary">
                     + Tambah Penempatan
                 </a>

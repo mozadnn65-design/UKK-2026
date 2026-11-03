@@ -4,8 +4,8 @@ $current_page = basename($_SERVER['PHP_SELF']);
 if ($_SESSION['role'] === "admin") {
 ?>
     <!-- SIDEBAR ADMIN -->
-    <div class="col-md-3 col-lg-2 bg-dark min-vh-100 p-3">
-        <h4 class="text-white mb-4">
+    <div class="col-md-3 col-lg-2 bg-dark min-vh-100 p-3 sticky-md-top align-self-start">
+        <h4 class="text-white fw-bold lh-sm mb-4 px-3 py-3 rounded-3 bg-black bg-opacity-25 border-start border-4 border-info shadow">
             Pelanggaran Siswa
         </h4>
 
@@ -106,8 +106,8 @@ if ($_SESSION['role'] === "admin") {
 ?>
 
     <!-- SIDEBAR GURU -->
-    <div class="col-md-3 col-lg-2 bg-dark min-vh-100 p-3">
-        <h4 class="text-white mb-4">
+    <div class="col-md-3 col-lg-2 bg-dark min-vh-100 p-3 sticky-md-top align-self-start">
+        <h4 class="text-white fw-bold lh-sm mb-4 px-3 py-3 rounded-3 bg-black bg-opacity-25 border-start border-4 border-info shadow">
             Pelanggaran Siswa
         </h4>
 
