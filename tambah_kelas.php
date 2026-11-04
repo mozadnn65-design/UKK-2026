@@ -1,4 +1,3 @@
-
 <?php
 // tambah_kelas.php
 include 'includes/cek_session.php';
@@ -43,6 +42,7 @@ include 'includes/cek_session.php';
                           method="POST"
                           id="formTambahKelas">
 
+                        <!-- NAMA KELAS -->
                         <div class="mb-3">
                             <label for="nama" class="form-label">
                                 Nama Kelas
@@ -52,33 +52,71 @@ include 'includes/cek_session.php';
                                    name="nama"
                                    id="nama"
                                    class="form-control"
+                                   placeholder="Contoh: X RPL 1"
                                    required>
                         </div>
 
+                        <!-- DROPDOWN TINGKAT -->
                         <div class="mb-3">
                             <label for="tingkat" class="form-label">
                                 Tingkat
                             </label>
 
-                            <input type="text"
-                                   name="tingkat"
-                                   id="tingkat"
-                                   class="form-control"
-                                   required>
+                            <select name="tingkat"
+                                    id="tingkat"
+                                    class="form-select"
+                                    required>
+
+                                <option value="" selected disabled>
+                                    -- Pilih Tingkat --
+                                </option>
+
+                                <option value="X">X</option>
+                                <option value="XI">XI</option>
+                                <option value="XII">XII</option>
+
+                            </select>
                         </div>
 
+                        <!-- DROPDOWN JURUSAN -->
                         <div class="mb-3">
                             <label for="jurusan" class="form-label">
                                 Jurusan
                             </label>
 
-                            <input type="text"
-                                   name="jurusan"
-                                   id="jurusan"
-                                   class="form-control"
-                                   required>
+                            <select name="jurusan"
+                                    id="jurusan"
+                                    class="form-select"
+                                    required>
+
+                                <option value="" selected disabled>
+                                    -- Pilih Jurusan --
+                                </option>
+
+                                <option value="RPL">
+                                    Rekayasa Perangkat Lunak (RPL)
+                                </option>
+
+                                <option value="TKJ">
+                                    Teknik Komputer dan Jaringan (TKJ)
+                                </option>
+
+                                <option value="AKL">
+                                    Akuntansi dan Keuangan Lembaga (AKL)
+                                </option>
+
+                                <option value="OTKP">
+                                    Otomatisasi dan Tata Kelola Perkantoran (OTKP)
+                                </option>
+
+                                <option value="BDP">
+                                    Bisnis Daring dan Pemasaran (BDP)
+                                </option>
+
+                            </select>
                         </div>
 
+                        <!-- STATUS AKTIF -->
                         <div class="mb-4">
                             <label for="status_aktif" class="form-label">
                                 Status Aktif
@@ -88,11 +126,14 @@ include 'includes/cek_session.php';
                                     id="status_aktif"
                                     class="form-select"
                                     required>
+
                                 <option value="1">Aktif</option>
                                 <option value="0">Tidak Aktif</option>
+
                             </select>
                         </div>
 
+                        <!-- TOMBOL -->
                         <button type="submit" class="btn btn-primary">
                             Simpan Kelas
                         </button>

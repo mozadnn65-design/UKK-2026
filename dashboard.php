@@ -330,7 +330,7 @@ $total_kelas = hitungData($koneksi, 't_kelas');
 
                             <div class="card-body p-4">
 
-                                <h5 class="fw-bold text-dark mb-3">
+                                <h5 class="fw-bold text-primary mb-3">
                                     Riwayat Pelanggaran
                                 </h5>
 
@@ -340,7 +340,7 @@ $total_kelas = hitungData($koneksi, 't_kelas');
                                 </p>
 
                                 <a href="riwayat.php"
-                                   class="btn btn-outline-primary w-100">
+                                   class="btn btn-primary w-100">
                                     Lihat Riwayat
                                 </a>
 
@@ -358,7 +358,7 @@ $total_kelas = hitungData($koneksi, 't_kelas');
 
                             <div class="card-body p-4">
 
-                                <h5 class="fw-bold text-dark mb-3">
+                                <h5 class="fw-bold text-primary mb-3">
                                     Rekap Poin
                                 </h5>
 
@@ -368,7 +368,7 @@ $total_kelas = hitungData($koneksi, 't_kelas');
                                 </p>
 
                                 <a href="rekap_poin.php"
-                                   class="btn btn-dark w-100">
+                                   class="btn btn-primary w-100">
                                     Lihat Rekap
                                 </a>
 

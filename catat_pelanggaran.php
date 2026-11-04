@@ -294,7 +294,7 @@ $hasil = mysqli_query($koneksi, $sql);
                                     <td><?php echo htmlspecialchars($row['tindakan']); ?></td>
                                     <td><?php echo htmlspecialchars($row['status']); ?></td>
                                     <td>
-                                        <a href="edit_pelanggaran.php?id=<?php echo $row['id']; ?>"
+                                        <a href="edit_catat_pelanggaran.php?id=<?php echo $row['id']; ?>"
                                         class="btn btn-warning btn-sm">
                                             Edit
                                         </a>

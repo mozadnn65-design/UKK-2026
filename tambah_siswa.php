@@ -1,4 +1,3 @@
-
 <?php
 // tambah_siswa.php
 include 'includes/cek_session.php';
@@ -86,8 +85,9 @@ include 'includes/cek_session.php';
 
                         <div class="mb-3">
                             <label class="form-label">Tanggal Lahir</label>
-                            <input type="date" name="tanggal_lahir"
-                                   class="form-control" required>
+                            <input type="date" name="tanggal_lahir" id="tanggal_lahir"
+                                   class="form-control"
+                                   min="2000-01-01" max="<?= date('Y-m-d'); ?>" required>
                         </div>
 
                         <div class="mb-3">
@@ -136,6 +136,15 @@ document.getElementById('formTambahSiswa').addEventListener('submit', function(e
         e.preventDefault();
         alert('NISN harus tepat 10 angka!');
         document.getElementById('nisn').focus();
+        return;
+    }
+
+    const tgl = document.getElementById('tanggal_lahir').value;
+    const hariIni = new Date().toISOString().slice(0, 10);
+    if (tgl < '2000-01-01' || tgl > hariIni) {
+        e.preventDefault();
+        alert('Tanggal lahir harus antara 01-01-2000 dan hari ini!');
+        document.getElementById('tanggal_lahir').focus();
     }
 });
 </script>

@@ -1,25 +1,41 @@
-
 <?php
 // tambah_wali_kelas.php
 include 'includes/cek_session.php';
 include 'config/koneksi.php';
 
-// Ambil data tahun ajaran
+// 1. Mengambil tahun ajaran yang aktif
 $tahun = mysqli_query(
     $koneksi,
-    "SELECT id, nama FROM t_tahun_ajaran ORDER BY id DESC"
+    "SELECT id, nama
+     FROM t_tahun_ajaran
+     WHERE status_aktif = 1
+     ORDER BY id DESC"
 );
 
-// Ambil data kelas
+// 2. Mengambil kelas yang belum memiliki wali kelas
 $kelas = mysqli_query(
     $koneksi,
-    "SELECT id, nama FROM t_kelas ORDER BY nama ASC"
+    "SELECT id, nama
+     FROM t_kelas
+     WHERE id NOT IN (
+         SELECT kelas_id
+         FROM t_wali_kelas
+         WHERE status_aktif = 1
+     )
+     ORDER BY nama ASC"
 );
 
-// Ambil data guru
+// 3. Mengambil guru yang belum menjadi wali kelas
 $guru = mysqli_query(
     $koneksi,
-    "SELECT id, nama FROM t_guru ORDER BY nama ASC"
+    "SELECT id, nama
+     FROM t_guru
+     WHERE id NOT IN (
+         SELECT guru_id
+         FROM t_wali_kelas
+         WHERE status_aktif = 1
+     )
+     ORDER BY nama ASC"
 );
 ?>
 

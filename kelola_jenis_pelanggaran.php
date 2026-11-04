@@ -1,4 +1,3 @@
-
 <?php
 session_start();
 include "config/koneksi.php";
@@ -107,7 +106,6 @@ $data = mysqli_query($koneksi, "SELECT * FROM t_pelanggaran ORDER BY id DESC");
 
                                 <tr>
                                     <th>No</th>
-                                    <th>ID Kategori</th>
                                     <th>Kode</th>
                                     <th>Nama Pelanggaran</th>
                                     <th>Poin</th>
@@ -133,10 +131,6 @@ $data = mysqli_query($koneksi, "SELECT * FROM t_pelanggaran ORDER BY id DESC");
 
                                     <td>
                                         <?= $no++; ?>
-                                    </td>
-
-                                    <td>
-                                        <?= htmlspecialchars($pelanggaran['pelanggaran_kategori_id'] ?? ''); ?>
                                     </td>
 
                                     <td>
@@ -281,14 +275,14 @@ $(document).ready(function () {
 
         lengthMenu: [5, 10, 25, 50, 100],
 
-        // Urutkan berdasarkan ID terbaru
+        // Urutan awal mengikuti kolom No
         order: [[0, 'asc']],
 
-        // Kolom aksi tidak bisa diurutkan atau dicari
+        // Kolom Aksi (kolom ke-9, indeks 8) tidak bisa diurutkan atau dicari
         columnDefs: [
 
             {
-                targets: 9,
+                targets: 8,
                 orderable: false,
                 searchable: false
             }

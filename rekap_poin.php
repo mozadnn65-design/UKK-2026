@@ -173,7 +173,13 @@ $jumlah_siswa = count($data_rekap);
 <div class="container-fluid">
     <div class="row">
 
-        <?php include 'layout/sidebar.php'; ?>
+        <?php
+        // Sidebar disembunyikan saat dicetak memakai class Bootstrap d-print-none
+        ob_start();
+        include 'layout/sidebar.php';
+        $sidebar_html = ob_get_clean();
+        echo preg_replace('/class="/', 'class="d-print-none ', $sidebar_html, 1);
+        ?>
 
         <!-- KONTEN -->
         <main class="col-md-9 col-lg-10 p-4">
