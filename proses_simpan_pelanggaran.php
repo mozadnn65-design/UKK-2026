@@ -1,4 +1,3 @@
-```php
 <?php
 session_start();
 include 'config/koneksi.php';
@@ -32,12 +31,33 @@ if (
     exit;
 }
 
+// Ambil nama siswa, kelas, pelanggaran, dan guru berdasarkan ID
+$q = mysqli_prepare($koneksi, "SELECT nama FROM t_siswa WHERE id = ?");
+mysqli_stmt_bind_param($q, "i", $siswa_id);
+mysqli_stmt_execute($q);
+$nama_siswa = mysqli_fetch_assoc(mysqli_stmt_get_result($q))['nama'] ?? '';
+
+$q = mysqli_prepare($koneksi, "SELECT nama FROM t_kelas WHERE id = ?");
+mysqli_stmt_bind_param($q, "i", $kelas_id);
+mysqli_stmt_execute($q);
+$nama_kelas = mysqli_fetch_assoc(mysqli_stmt_get_result($q))['nama'] ?? '';
+
+$q = mysqli_prepare($koneksi, "SELECT nama FROM t_pelanggaran WHERE id = ?");
+mysqli_stmt_bind_param($q, "i", $pelanggaran_id);
+mysqli_stmt_execute($q);
+$nama_pelanggaran = mysqli_fetch_assoc(mysqli_stmt_get_result($q))['nama'] ?? '';
+
+$q = mysqli_prepare($koneksi, "SELECT nama FROM t_guru WHERE id = ?");
+mysqli_stmt_bind_param($q, "i", $guru_id);
+mysqli_stmt_execute($q);
+$nama_guru = mysqli_fetch_assoc(mysqli_stmt_get_result($q))['nama'] ?? '';
+
 // Simpan pelanggaran
 $sql = "INSERT INTO t_pelanggaran_siswa
-        (siswa_id, tahun_ajaran_id, kelas_id, pelanggaran_id,
-         pelanggaran_kategori_id, guru_id, tanggal, poin,
+        (siswa_id, nama_siswa, tahun_ajaran_id, kelas_id, nama_kelas, pelanggaran_id,
+         nama_pelanggaran, pelanggaran_kategori_id, guru_id, nama_guru, tanggal, poin,
          status, keterangan, tindakan)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 $stmt = mysqli_prepare($koneksi, $sql);
 
@@ -49,13 +69,17 @@ if (!$stmt) {
 
 mysqli_stmt_bind_param(
     $stmt,
-    "iiiiiisisss",
+    "isiisisiisissss",
     $siswa_id,
+    $nama_siswa,
     $tahun_ajaran_id,
     $kelas_id,
+    $nama_kelas,
     $pelanggaran_id,
+    $nama_pelanggaran,
     $pelanggaran_kategori_id,
     $guru_id,
+    $nama_guru,
     $tanggal,
     $poin,
     $status,
@@ -75,4 +99,3 @@ mysqli_stmt_close($stmt);
 header("Location: catat_pelanggaran.php");
 exit;
 ?>
-```

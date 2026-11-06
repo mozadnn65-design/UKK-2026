@@ -4,7 +4,7 @@ include "config/koneksi.php";
 
 
 // DATA AKUN ADMIN
-$nama_admin = "Ahmad Ramadhan";
+$nama_admin = "admin";
 $email_admin = "admin@gmail.com";
 $password_admin = password_hash("admin123", PASSWORD_DEFAULT);
 $role_admin = "admin";
@@ -28,7 +28,7 @@ if (mysqli_query($koneksi, $sql_admin)) {
 
 
 // DATA AKUN GURU
-$nama_guru = "Fajar Aditya";
+$nama_guru = "guru";
 $email_guru = "guru@gmail.com";
 $password_guru = password_hash("guru123", PASSWORD_DEFAULT);
 $role_guru = "guru";

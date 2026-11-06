@@ -1,12 +1,31 @@
-
 <?php
 // tambah_penempatan_siswa.php
 include 'includes/cek_session.php';
 include 'config/koneksi.php';
 
-$siswa = mysqli_query($koneksi, "SELECT id, nis, nama FROM t_siswa ORDER BY nama ASC");
+// Hanya siswa yang belum ditempatkan pada tahun ajaran aktif
+$siswa = mysqli_query($koneksi, "
+    SELECT s.id, s.nis, s.nama
+    FROM t_siswa s
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM t_kelas_siswa ks
+        JOIN t_tahun_ajaran ta ON ta.id = ks.tahun_ajaran_id
+        WHERE ks.siswa_id = s.id
+          AND ta.status_aktif = 1
+    )
+    ORDER BY s.nama ASC
+");
+
 $kelas = mysqli_query($koneksi, "SELECT id, nama FROM t_kelas ORDER BY nama ASC");
-$tahun = mysqli_query($koneksi, "SELECT id, nama FROM t_tahun_ajaran ORDER BY nama DESC");
+
+// Hanya tahun ajaran yang aktif
+$tahun = mysqli_query($koneksi, "
+    SELECT id, nama
+    FROM t_tahun_ajaran
+    WHERE status_aktif = 1
+    ORDER BY nama DESC
+");
 ?>
 
 <!DOCTYPE html>
@@ -49,10 +68,14 @@ $tahun = mysqli_query($koneksi, "SELECT id, nama FROM t_tahun_ajaran ORDER BY na
                             <label class="form-label">Siswa</label>
                             <select name="siswa_id" class="form-select" required>
                                 <option value="">-- Pilih Siswa --</option>
-                                <?php while ($row = mysqli_fetch_assoc($siswa)) { ?>
-                                    <option value="<?= $row['id']; ?>">
-                                        <?= htmlspecialchars($row['nis'] . ' - ' . $row['nama']); ?>
-                                    </option>
+                                <?php if (mysqli_num_rows($siswa) > 0) { ?>
+                                    <?php while ($row = mysqli_fetch_assoc($siswa)) { ?>
+                                        <option value="<?= $row['id']; ?>">
+                                            <?= htmlspecialchars($row['nis'] . ' - ' . $row['nama']); ?>
+                                        </option>
+                                    <?php } ?>
+                                <?php } else { ?>
+                                    <option value="" disabled>Semua siswa sudah ditempatkan</option>
                                 <?php } ?>
                             </select>
                         </div>
@@ -61,10 +84,14 @@ $tahun = mysqli_query($koneksi, "SELECT id, nama FROM t_tahun_ajaran ORDER BY na
                             <label class="form-label">Tahun Ajaran</label>
                             <select name="tahun_ajaran_id" class="form-select" required>
                                 <option value="">-- Pilih Tahun Ajaran --</option>
-                                <?php while ($row = mysqli_fetch_assoc($tahun)) { ?>
-                                    <option value="<?= $row['id']; ?>">
-                                        <?= htmlspecialchars($row['nama']); ?>
-                                    </option>
+                                <?php if (mysqli_num_rows($tahun) > 0) { ?>
+                                    <?php while ($row = mysqli_fetch_assoc($tahun)) { ?>
+                                        <option value="<?= $row['id']; ?>">
+                                            <?= htmlspecialchars($row['nama']); ?>
+                                        </option>
+                                    <?php } ?>
+                                <?php } else { ?>
+                                    <option value="" disabled>Belum ada tahun ajaran aktif</option>
                                 <?php } ?>
                             </select>
                         </div>
@@ -90,7 +117,7 @@ $tahun = mysqli_query($koneksi, "SELECT id, nama FROM t_tahun_ajaran ORDER BY na
                         <div class="mb-3">
                             <label class="form-label">Tanggal Selesai</label>
                             <input type="date" name="tanggal_selesai"
-                                   class="form-control">
+                                   class="form-control" required>
                         </div>
 
                         <div class="mb-3">
