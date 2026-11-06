@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-=
+
 // MENGAMBIL DATA FORM
 
 $siswa_id = (int) ($_POST['siswa_id'] ?? 0);
