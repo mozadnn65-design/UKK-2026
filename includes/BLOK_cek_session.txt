@@ -1,0 +1,11 @@
+Tempel blok ini di includes/cek_session.php,
+SETELAH pengecekan login yang sudah ada (jangan menimpa file aslinya):
+
+// Wali kelas hanya boleh membuka halaman berikut
+$halaman_wali = ['dashboard.php', 'laporan.php', 'riwayat.php', 'rekap_poin.php', 'logout.php'];
+
+if (!empty($_SESSION['is_wali_kelas'])
+    && !in_array(basename($_SERVER['PHP_SELF']), $halaman_wali)) {
+    header("Location: dashboard.php");
+    exit;
+}

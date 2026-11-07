@@ -107,6 +107,57 @@ if ($_SESSION['role'] === "admin") {
     </div>
 
 <?php
+} elseif ($_SESSION['role'] === "guru" && !empty($_SESSION['is_wali_kelas'])) {
+?>
+
+    <!-- SIDEBAR WALI KELAS -->
+    <div class="col-md-3 col-lg-2 bg-dark min-vh-100 p-3 sticky-md-top align-self-start">
+        <h4 class="text-white fw-bold lh-sm mb-4 px-3 py-3 rounded-3 bg-black bg-opacity-25 border-start border-4 border-info shadow">
+            Pelanggaran Siswa
+        </h4>
+
+        <ul class="nav nav-pills flex-column">
+
+            <li class="nav-item mb-2">
+                <a href="dashboard.php"
+                   class="nav-link <?= ($current_page == 'dashboard.php') ? 'active' : 'text-white' ?>">
+                    Dashboard
+                </a>
+            </li>
+
+            <li class="nav-item mb-2">
+                <a href="laporan.php"
+                   class="nav-link <?= ($current_page == 'laporan.php') ? 'active' : 'text-white' ?>">
+                    Laporan
+                </a>
+            </li>
+
+            <li class="nav-item mb-2">
+                <a href="riwayat.php"
+                   class="nav-link <?= ($current_page == 'riwayat.php') ? 'active' : 'text-white' ?>">
+                    Riwayat
+                </a>
+            </li>
+
+            <li class="nav-item mb-2">
+                <a href="rekap_poin.php"
+                   class="nav-link <?= ($current_page == 'rekap_poin.php') ? 'active' : 'text-white' ?>">
+                    Rekap Poin
+                </a>
+            </li>
+
+            <hr class="text-secondary">
+
+            <li class="nav-item">
+                <a href="logout.php" class="nav-link text-danger">
+                    Logout
+                </a>
+            </li>
+
+        </ul>
+    </div>
+
+<?php
 } elseif ($_SESSION['role'] === "guru") {
 ?>
 

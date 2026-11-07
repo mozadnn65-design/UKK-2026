@@ -7,6 +7,10 @@ include 'includes/cek_session.php';
 // Menghubungkan ke database
 include 'config/koneksi.php';
 
+// Data wali kelas dari session (diisi saat login)
+$is_wali = !empty($_SESSION['is_wali_kelas']);
+$guru_id = (int) ($_SESSION['guru_id'] ?? 0);
+
 // Mengambil kata pencarian
 $cari = isset($_GET['cari'])
     ? mysqli_real_escape_string($koneksi, trim($_GET['cari']))
@@ -21,6 +25,18 @@ $status = isset($_GET['status'])
 $sql = "SELECT *
         FROM t_pelanggaran_siswa
         WHERE 1=1";
+
+// Wali kelas hanya melihat riwayat dari kelas yang diampunya
+if ($is_wali) {
+    $sql .= " AND EXISTS (
+        SELECT 1
+        FROM t_wali_kelas wk
+        WHERE wk.guru_id = $guru_id
+          AND wk.kelas_id = t_pelanggaran_siswa.kelas_id
+          AND wk.tahun_ajaran_id = t_pelanggaran_siswa.tahun_ajaran_id
+          AND wk.status_aktif = 1
+    )";
+}
 
 // Pencarian berdasarkan nama siswa, pelanggaran, kelas, atau guru
 if ($cari != '') {
@@ -87,9 +103,11 @@ $jumlah = mysqli_num_rows($query);
                     </p>
                 </div>
 
-                <a href="dashboard.php" class="btn btn-secondary">
-                    Kembali ke Dashboard
-                </a>
+                <?php if (true) { ?>
+                    <a href="dashboard.php" class="btn btn-secondary">
+                        Kembali ke Dashboard
+                    </a>
+                <?php } ?>
             </div>
 
             <!-- Ringkasan jumlah data -->

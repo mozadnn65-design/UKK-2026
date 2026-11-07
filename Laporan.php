@@ -351,11 +351,13 @@ $hasil = mysqli_stmt_get_result($stmt);
                 </div>
             </div>
 
-            <div class="mt-3 no-print">
-                <a href="dashboard.php" class="btn btn-secondary">
-                    Kembali ke Dashboard
-                </a>
-            </div>
+            <?php if (true) { ?>
+                <div class="mt-3 no-print">
+                    <a href="dashboard.php" class="btn btn-secondary">
+                        Kembali ke Dashboard
+                    </a>
+                </div>
+            <?php } ?>
 
         </main>
 

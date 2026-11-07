@@ -1,4 +1,3 @@
-
 <?php
 // Memeriksa session login
 include "includes/cek_session.php";
@@ -10,6 +9,32 @@ $role = $_SESSION['role'] ?? '-';
 
 // Menghubungkan database
 include "config/koneksi.php";
+
+// Penanda wali kelas (diisi saat login)
+$is_wali = ($role === 'guru') && !empty($_SESSION['is_wali_kelas']);
+$label_role = $is_wali ? 'guru (wali kelas)' : $role;
+
+// Kelas yang diwalikan oleh guru ini
+$kelas_diwalikan = [];
+if ($is_wali) {
+    $guru_id_wali = (int) ($_SESSION['guru_id'] ?? 0);
+
+    $q_kelas_wali = mysqli_query(
+        $koneksi,
+        "SELECT DISTINCT k.nama
+         FROM t_wali_kelas wk
+         INNER JOIN t_kelas k ON k.id = wk.kelas_id
+         WHERE wk.guru_id = $guru_id_wali
+           AND wk.status_aktif = 1
+         ORDER BY k.nama ASC"
+    );
+
+    if ($q_kelas_wali) {
+        while ($baris_kelas = mysqli_fetch_assoc($q_kelas_wali)) {
+            $kelas_diwalikan[] = $baris_kelas['nama'];
+        }
+    }
+}
 
 // Menghitung jumlah data dari database
 function hitungData($koneksi, $tabel)
@@ -135,7 +160,7 @@ $total_kelas = hitungData($koneksi, 't_kelas');
 
                             <p class="mb-0">
                                 <span class="badge bg-dark px-3 py-2">
-                                    <?php echo htmlspecialchars($role); ?>
+                                    <?php echo htmlspecialchars($label_role); ?>
                                 </span>
                             </p>
 
@@ -283,7 +308,7 @@ $total_kelas = hitungData($koneksi, 't_kelas');
                 <div class="mb-3">
 
                     <h5 class="fw-bold text-dark">
-                        Menu Operasional Guru
+                        Menu Operasional <?php echo $is_wali ? 'Wali Kelas' : 'Guru'; ?>
                     </h5>
 
                     <p class="text-secondary">
@@ -295,6 +320,7 @@ $total_kelas = hitungData($koneksi, 't_kelas');
 
                 <div class="row g-3">
 
+                    <?php if (!$is_wali) { ?>
                     <!-- CATAT PELANGGARAN -->
                     <div class="col-md-4">
 
@@ -323,8 +349,10 @@ $total_kelas = hitungData($koneksi, 't_kelas');
                     </div>
 
 
+                    <?php } ?>
+
                     <!-- RIWAYAT PELANGGARAN -->
-                    <div class="col-md-4">
+                    <div class="<?php echo $is_wali ? 'col-md-6' : 'col-md-4'; ?>">
 
                         <div class="card border-0 shadow-sm rounded-3 h-100">
 
@@ -352,7 +380,7 @@ $total_kelas = hitungData($koneksi, 't_kelas');
 
 
                     <!-- REKAP POIN -->
-                    <div class="col-md-4">
+                    <div class="<?php echo $is_wali ? 'col-md-6' : 'col-md-4'; ?>">
 
                         <div class="card border-0 shadow-sm rounded-3 h-100">
 
@@ -380,6 +408,33 @@ $total_kelas = hitungData($koneksi, 't_kelas');
 
                 </div>
 
+
+                <?php if ($is_wali) { ?>
+                    <!-- INFORMASI WALI KELAS -->
+                    <div class="card border-0 shadow-sm rounded-3 mt-4">
+
+                        <div class="card-body p-4">
+
+                            <h6 class="fw-bold text-dark">
+                                Kelas yang Diwalikan
+                            </h6>
+
+                            <p class="text-secondary mb-0">
+                                <?php if (!empty($kelas_diwalikan)) { ?>
+                                    Anda hanya dapat melihat data pelanggaran dari kelas:
+                                    <b class="text-dark">
+                                        <?php echo htmlspecialchars(implode(', ', $kelas_diwalikan)); ?>
+                                    </b>.
+                                <?php } else { ?>
+                                    Belum ada kelas aktif yang ditetapkan untuk Anda.
+                                    Silakan hubungi administrator.
+                                <?php } ?>
+                            </p>
+
+                        </div>
+
+                    </div>
+                <?php } ?>
 
                 <!-- INFORMASI GURU -->
                 <div class="card border-0 shadow-sm rounded-3 mt-4">
