@@ -106,8 +106,8 @@ $hasil = mysqli_query($koneksi, $sql);
                 </div>
             <?php } ?>
 
-            <div class="card mb-4">
-                <div class="card-header">
+             <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
                     Form Catat Pelanggaran
                 </div>
 
@@ -255,8 +255,8 @@ $hasil = mysqli_query($koneksi, $sql);
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-header">
+             <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
                     Data Catatan Pelanggaran
                 </div>
 
