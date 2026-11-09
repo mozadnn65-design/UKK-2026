@@ -1,12 +1,23 @@
 <?php
-include "config/koneksi.php";
+include 'includes/cek_session.php';
+include 'config/koneksi.php';
 
-$id = $_GET['id'];
+$id = (int) ($_GET['id'] ?? 0);
 
-mysqli_query(
-    $koneksi,
-    "DELETE FROM t_pelanggaran_kategori WHERE id='$id'"
-);
+$hapus = mysqli_prepare($koneksi, "DELETE FROM t_pelanggaran_kategori WHERE id = ?");
+mysqli_stmt_bind_param($hapus, "i", $id);
 
-header("Location: kelola_pelanggaran_kategori.php");
-?>
+try {
+    $berhasil = mysqli_stmt_execute($hapus);
+} catch (Exception $e) {
+    $berhasil = false;
+}
+
+if ($berhasil) {
+    $_SESSION['pesan_error'] = 'Kategori pelanggaran berhasil dihapus!';
+} else {
+    $_SESSION['pesan_error'] = 'Kategori pelanggaran tidak bisa dihapus karena masih dipakai data lain!';
+}
+
+header('Location: kelola_pelanggaran_kategori.php');
+exit;

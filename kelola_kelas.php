@@ -38,13 +38,12 @@ $hasil = mysqli_query($koneksi, $sql);
         <main class="col-md-9 col-lg-10 p-4">
 
             <h2 class="mb-4">Kelola Kelas</h2>
-          <?php
+                   <?php
             if (isset($_SESSION['pesan_sukses'])) {
                 echo '<div class="alert alert-success alert-dismissible fade show" role="alert">';
                 echo $_SESSION['pesan_sukses'];
                 echo '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
                 echo '</div>';
-
                 unset($_SESSION['pesan_sukses']);
             }
 
@@ -53,7 +52,6 @@ $hasil = mysqli_query($koneksi, $sql);
                 echo $_SESSION['pesan_error'];
                 echo '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
                 echo '</div>';
-
                 unset($_SESSION['pesan_error']);
             }
             ?>

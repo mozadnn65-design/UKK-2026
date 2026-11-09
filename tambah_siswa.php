@@ -46,6 +46,7 @@ include 'includes/cek_session.php';
                             <input type="text" name="nis" id="nis"
                                    class="form-control" maxlength="10"
                                    pattern="[0-9]{10}" inputmode="numeric"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                                    title="NIS harus tepat 10 angka" required>
                             <div class="form-text">NIS harus terdiri dari 10 angka.</div>
                         </div>
@@ -53,9 +54,10 @@ include 'includes/cek_session.php';
                         <div class="mb-3">
                             <label class="form-label">NISN</label>
                             <input type="text" name="nisn" id="nisn"
-                                   class="form-control" maxlength="10"
-                                   pattern="[0-9]{10}" inputmode="numeric"
-                                   title="NISN harus tepat 10 angka" required>
+                                class="form-control" maxlength="10"
+                                pattern="[0-9]{10}" inputmode="numeric"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                title="NISN harus tepat 10 angka" required>
                             <div class="form-text">NISN harus terdiri dari 10 angka.</div>
                         </div>
 

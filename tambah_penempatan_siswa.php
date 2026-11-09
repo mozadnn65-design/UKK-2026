@@ -71,7 +71,7 @@ $tahun = mysqli_query($koneksi, "
                                 <?php if (mysqli_num_rows($siswa) > 0) { ?>
                                     <?php while ($row = mysqli_fetch_assoc($siswa)) { ?>
                                         <option value="<?= $row['id']; ?>">
-                                            <?= htmlspecialchars($row['nis'] . ' - ' . $row['nama']); ?>
+                                            <?= htmlspecialchars($row['nama']); ?>
                                         </option>
                                     <?php } ?>
                                 <?php } else { ?>

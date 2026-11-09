@@ -1,32 +1,33 @@
 <?php
-
 session_start();
+include 'config/koneksi.php';
 
-include "config/koneksi.php";
-
-// Cek login
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+    header('Location: login.php');
     exit;
 }
 
-// Hanya admin
-if ($_SESSION['role'] != "admin") {
-    echo "Akses ditolak!";
+if ($_SESSION['role'] != 'admin') {
+    echo 'Akses ditolak!';
     exit;
 }
 
-// Ambil ID
-$id = $_GET['id'];
+$id = (int) ($_GET['id'] ?? 0);
 
-// Hapus data
-$query = mysqli_query(
-    $koneksi,
-    "DELETE FROM t_tahun_ajaran WHERE id = '$id'"
-);
+$hapus = mysqli_prepare($koneksi, "DELETE FROM t_tahun_ajaran WHERE id = ?");
+mysqli_stmt_bind_param($hapus, "i", $id);
 
-// Kembali ke halaman kelola
-header("Location: kelola_tahun_ajaran.php");
+try {
+    $berhasil = mysqli_stmt_execute($hapus);
+} catch (Exception $e) {
+    $berhasil = false;
+}
+
+if ($berhasil) {
+    $_SESSION['pesan_error'] = 'Data tahun ajaran berhasil dihapus!';
+} else {
+    $_SESSION['pesan_error'] = 'Data tahun ajaran tidak bisa dihapus karena masih dipakai data lain!';
+}
+
+header('Location: kelola_tahun_ajaran.php');
 exit;
-
-?>

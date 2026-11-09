@@ -1,41 +1,23 @@
-
 <?php
-session_start();
 include 'includes/cek_session.php';
 include 'config/koneksi.php';
 
-// Ambil ID jenis pelanggaran
 $id = (int) ($_GET['id'] ?? 0);
 
-if ($id <= 0) {
-    $_SESSION['pesan_error'] = 'ID jenis pelanggaran tidak valid.';
-    header("Location: kelola_jenis_pelanggaran.php");
-    exit;
+$hapus = mysqli_prepare($koneksi, "DELETE FROM t_pelanggaran WHERE id = ?");
+mysqli_stmt_bind_param($hapus, "i", $id);
+
+try {
+    $berhasil = mysqli_stmt_execute($hapus);
+} catch (Exception $e) {
+    $berhasil = false;
 }
 
-// Hapus data
-$stmt = mysqli_prepare(
-    $koneksi,
-    "DELETE FROM t_pelanggaran WHERE id = ?"
-);
-
-mysqli_stmt_bind_param($stmt, "i", $id);
-
-if (mysqli_stmt_execute($stmt)) {
-    if (mysqli_stmt_affected_rows($stmt) > 0) {
-        $_SESSION['pesan_sukses'] =
-            'Jenis pelanggaran berhasil dihapus.';
-    } else {
-        $_SESSION['pesan_error'] =
-            'Data jenis pelanggaran tidak ditemukan.';
-    }
+if ($berhasil) {
+    $_SESSION['pesan_error'] = 'Jenis pelanggaran berhasil dihapus!';
 } else {
-    $_SESSION['pesan_error'] =
-        'Gagal menghapus data. Data mungkin masih digunakan.';
+    $_SESSION['pesan_error'] = 'Jenis pelanggaran tidak bisa dihapus karena masih dipakai data lain!';
 }
 
-mysqli_stmt_close($stmt);
-
-header("Location: kelola_jenis_pelanggaran.php");
+header('Location: kelola_jenis_pelanggaran.php');
 exit;
-?>

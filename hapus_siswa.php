@@ -1,37 +1,23 @@
 <?php
+include 'includes/cek_session.php';
+include 'config/koneksi.php';
 
-session_start();
+$id = (int) ($_GET['id'] ?? 0);
 
-include "config/koneksi.php";
+try {
+    $hapus = mysqli_prepare($koneksi, "DELETE FROM t_siswa WHERE id = ?");
+    mysqli_stmt_bind_param($hapus, "i", $id);
+    mysqli_stmt_execute($hapus);
 
-// Cek login
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit;
+    if (mysqli_stmt_affected_rows($hapus) > 0) {
+        $_SESSION['pesan_error'] = 'Data siswa berhasil dihapus!';
+    } else {
+        $_SESSION['pesan_error'] = 'Data siswa tidak ditemukan!';
+    }
+
+} catch (Exception $e) {
+    $_SESSION['pesan_error'] = 'Data siswa tidak bisa dihapus karena masih dipakai data lain!';
 }
 
-// Cek admin
-if ($_SESSION['role'] != "admin") {
-    echo "Akses ditolak!";
-    exit;
-}
-
-$id = $_GET['id'];
-
-$query = mysqli_query(
-    $koneksi,
-    "DELETE FROM t_siswa WHERE id = '$id'"
-);
-
-if ($query) {
-
-    header("Location: kelola_siswa.php");
-    exit;
-
-} else {
-
-    echo "Data siswa gagal dihapus.";
-
-}
-
-?>
+header('Location: kelola_siswa.php');
+exit;

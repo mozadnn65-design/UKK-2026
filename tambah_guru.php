@@ -39,6 +39,7 @@ include 'includes/cek_session.php';
                             <label class="form-label">NIP</label>
                             <input type="text" name="nip" id="nip"
                                    class="form-control"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                                    maxlength="18" inputmode="numeric" required>
                             <small>NIP harus berupa angka, maksimal 18 digit.</small>
                         </div>

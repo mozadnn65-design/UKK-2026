@@ -50,26 +50,23 @@ $data = mysqli_query($koneksi, "SELECT * FROM t_pelanggaran ORDER BY id DESC");
             <h2 class="mb-4">Kelola Jenis Pelanggaran</h2>
 
             <!-- NOTIFIKASI -->
-            <?php
+              <?php
             if (isset($_SESSION['pesan_sukses'])) {
                 echo '<div class="alert alert-success alert-dismissible fade show" role="alert">';
-                echo htmlspecialchars($_SESSION['pesan_sukses']);
+                echo $_SESSION['pesan_sukses'];
                 echo '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
                 echo '</div>';
-
                 unset($_SESSION['pesan_sukses']);
             }
 
             if (isset($_SESSION['pesan_error'])) {
                 echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
-                echo htmlspecialchars($_SESSION['pesan_error']);
+                echo $_SESSION['pesan_error'];
                 echo '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
                 echo '</div>';
-
                 unset($_SESSION['pesan_error']);
             }
             ?>
-
             <!-- TOMBOL NAVIGASI -->
             <div class="mb-3">
 

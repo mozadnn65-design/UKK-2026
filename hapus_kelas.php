@@ -1,38 +1,33 @@
 <?php
-
 session_start();
+include 'config/koneksi.php';
 
-include "config/koneksi.php";
-
-// Cek login
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+    header('Location: login.php');
     exit;
 }
 
-// Cek admin
-if ($_SESSION['role'] != "admin") {
-    echo "Akses ditolak!";
+if ($_SESSION['role'] != 'admin') {
+    echo 'Akses ditolak!';
     exit;
 }
 
-$id = $_GET['id'];
+$id = (int) ($_GET['id'] ?? 0);
 
-// Menghapus data kelas
-$query = mysqli_query(
-    $koneksi,
-    "DELETE FROM t_kelas WHERE id = '$id'"
-);
+$hapus = mysqli_prepare($koneksi, "DELETE FROM t_kelas WHERE id = ?");
+mysqli_stmt_bind_param($hapus, "i", $id);
 
-if ($query) {
+try {
+    $berhasil = mysqli_stmt_execute($hapus);
+} catch (Exception $e) {
+    $berhasil = false;
+}
 
-    header("Location: kelola_kelas.php");
-    exit;
-
+if ($berhasil) {
+    $_SESSION['pesan_error'] = 'Data kelas berhasil dihapus!';
 } else {
-
-    echo "Data kelas gagal dihapus.";
-
+    $_SESSION['pesan_error'] = 'Data kelas tidak bisa dihapus karena masih dipakai data lain!';
 }
 
-?>
+header('Location: kelola_kelas.php');
+exit;

@@ -7,10 +7,12 @@ include 'config/koneksi.php';
 $sql = "SELECT
             w.*,
             k.nama AS nama_kelas,
-            g.nama AS nama_guru
+            g.nama AS nama_guru,
+            h.nama AS tahun_ajaran
         FROM t_wali_kelas w
         LEFT JOIN t_kelas k ON w.kelas_id = k.id
         LEFT JOIN t_guru g ON w.guru_id = g.id
+        LEFT JOIN t_tahun_ajaran h ON w.tahun_ajaran_id = h.id
         ORDER BY w.id DESC";
 
 $hasil = mysqli_query($koneksi, $sql);
@@ -42,13 +44,12 @@ $hasil = mysqli_query($koneksi, $sql);
         <main class="col-md-9 col-lg-10 p-4">
 
             <h2 class="mb-4">Kelola Wali Kelas</h2>
-          <?php
+             <?php
             if (isset($_SESSION['pesan_sukses'])) {
                 echo '<div class="alert alert-success alert-dismissible fade show" role="alert">';
                 echo $_SESSION['pesan_sukses'];
                 echo '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
                 echo '</div>';
-
                 unset($_SESSION['pesan_sukses']);
             }
 
@@ -57,7 +58,6 @@ $hasil = mysqli_query($koneksi, $sql);
                 echo $_SESSION['pesan_error'];
                 echo '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
                 echo '</div>';
-
                 unset($_SESSION['pesan_error']);
             }
             ?>
@@ -84,7 +84,7 @@ $hasil = mysqli_query($koneksi, $sql);
                             <thead class="table-dark">
                                 <tr>
                                     <th>No</th>
-                                    <th>Tahun Ajaran ID</th>
+                                    <th>Tahun Ajaran</th>
                                     <th>Kelas</th>
                                     <th>Guru</th>
                                     <th>Tanggal Mulai</th>
@@ -100,7 +100,7 @@ $hasil = mysqli_query($koneksi, $sql);
                                         <td></td>
 
                                         <td>
-                                            <?= htmlspecialchars($row['tahun_ajaran_id']) ?>
+                                            <?= htmlspecialchars($row['tahun_ajaran']) ?>
                                         </td>
 
                                         <td>

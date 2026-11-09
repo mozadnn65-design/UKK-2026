@@ -1,35 +1,33 @@
 <?php
-
 session_start();
-
-include "config/koneksi.php";
+include 'config/koneksi.php';
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+    header('Location: login.php');
     exit;
 }
 
-if ($_SESSION['role'] != "admin") {
-    echo "Akses ditolak!";
+if ($_SESSION['role'] != 'admin') {
+    echo 'Akses ditolak!';
     exit;
 }
 
-$id = $_GET['id'];
+$id = (int) ($_GET['id'] ?? 0);
 
-$query = mysqli_query(
-    $koneksi,
-    "DELETE FROM t_guru WHERE id = '$id'"
-);
+$hapus = mysqli_prepare($koneksi, "DELETE FROM t_guru WHERE id = ?");
+mysqli_stmt_bind_param($hapus, "i", $id);
 
-if ($query) {
+try {
+    $berhasil = mysqli_stmt_execute($hapus);
+} catch (Exception $e) {
+    $berhasil = false;
+}
 
-    header("Location: kelola_guru.php");
-    exit;
-
+if ($berhasil) {
+    $_SESSION['pesan_error'] = 'Data guru berhasil dihapus!';
 } else {
-
-    echo "Data guru gagal dihapus.";
-
+    $_SESSION['pesan_error'] = 'Data guru tidak bisa dihapus karena masih dipakai data lain!';
 }
 
-?>
+header('Location: kelola_guru.php');
+exit;

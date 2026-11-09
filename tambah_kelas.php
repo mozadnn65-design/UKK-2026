@@ -101,16 +101,16 @@ include 'includes/cek_session.php';
                                     Teknik Komputer dan Jaringan (TKJ)
                                 </option>
 
-                                <option value="AKL">
-                                    Akuntansi dan Keuangan Lembaga (AKL)
+                                <option value="TKR">
+                                    Teknik Kendaraan Ringan (TKR)
                                 </option>
 
-                                <option value="OTKP">
-                                    Otomatisasi dan Tata Kelola Perkantoran (OTKP)
+                                <option value="TSM">
+                                    Teknik Sepeda Motor (TSM)
                                 </option>
 
-                                <option value="BDP">
-                                    Bisnis Daring dan Pemasaran (BDP)
+                                <option value="BD">
+                                    Bisnis Digital (BD)
                                 </option>
 
                             </select>
