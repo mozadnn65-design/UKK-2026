@@ -13,8 +13,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     );
 
     // Samakan nama tabel dengan tabel yang ditampilkan
+    // Setelah tindakan disimpan, status otomatis "selesai"
+    // sehingga hilang dari halaman ini dan tampil di Riwayat
     $sql_update = "UPDATE t_pelanggaran_siswa
-                   SET tindakan = '$tindakan'
+                   SET tindakan = '$tindakan',
+                       status = 'selesai'
                    WHERE id = $id";
 
     if (mysqli_query($koneksi, $sql_update)) {
@@ -30,6 +33,7 @@ $sql = "SELECT id, nama_siswa, nama_kelas,
                nama_pelanggaran, tanggal,
                keterangan, tindakan
         FROM t_pelanggaran_siswa
+        WHERE LOWER(TRIM(IFNULL(status, ''))) <> 'selesai'
         ORDER BY tanggal DESC";
 
 $hasil = mysqli_query($koneksi, $sql);
@@ -68,7 +72,8 @@ if (!$hasil) {
 
             <h2 class="mb-2">Tindakan Pelanggaran Siswa</h2>
             <p class="text-muted">
-                Kelola tindakan untuk setiap pelanggaran siswa.
+                Isi tindakan untuk pelanggaran yang belum ditindak.
+                Setelah disimpan, datanya pindah ke Riwayat.
             </p>
 
             <div class="mb-3">
@@ -80,7 +85,7 @@ if (!$hasil) {
             <!-- Pesan berhasil -->
             <?php if (isset($_GET['pesan']) && $_GET['pesan'] === 'berhasil') { ?>
                 <div class="alert alert-success alert-dismissible fade show">
-                    Tindakan berhasil disimpan.
+                    Tindakan berhasil disimpan dan dipindahkan ke Riwayat.
                     <button type="button" class="btn-close"
                             data-bs-dismiss="alert"></button>
                 </div>

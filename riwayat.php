@@ -16,15 +16,11 @@ $cari = isset($_GET['cari'])
     ? mysqli_real_escape_string($koneksi, trim($_GET['cari']))
     : '';
 
-// Mengambil filter status
-$status = isset($_GET['status'])
-    ? mysqli_real_escape_string($koneksi, trim($_GET['status']))
-    : '';
-
-// Query dasar
+// Query dasar: riwayat hanya berisi pelanggaran yang sudah ditindak
+// (status menjadi "selesai" saat tindakan disimpan di halaman Tindakan)
 $sql = "SELECT *
         FROM t_pelanggaran_siswa
-        WHERE 1=1";
+        WHERE LOWER(TRIM(IFNULL(status, ''))) = 'selesai'";
 
 // Wali kelas hanya melihat riwayat dari kelas yang diampunya
 if ($is_wali) {
@@ -46,11 +42,6 @@ if ($cari != '') {
         OR nama_kelas LIKE '%$cari%'
         OR nama_guru LIKE '%$cari%'
     )";
-}
-
-// Filter berdasarkan status
-if ($status != '') {
-    $sql .= " AND status = '$status'";
 }
 
 // Urutkan berdasarkan tanggal terbaru
@@ -99,7 +90,7 @@ $jumlah = mysqli_num_rows($query);
                 <div>
                     <h2>Riwayat Pelanggaran Siswa</h2>
                     <p class="text-muted mb-0">
-                        Daftar catatan pelanggaran siswa yang telah dicatat.
+                        Daftar pelanggaran siswa yang sudah ditindak.
                     </p>
                 </div>
 
@@ -130,7 +121,7 @@ $jumlah = mysqli_num_rows($query);
                     <form method="GET" action="riwayat.php">
                         <div class="row g-3">
 
-                            <div class="col-md-6">
+                            <div class="col-md-9">
                                 <label for="cari" class="form-label">
                                     Cari Riwayat
                                 </label>
@@ -142,27 +133,6 @@ $jumlah = mysqli_num_rows($query);
                                     class="form-control"
                                     placeholder="Nama siswa, pelanggaran, kelas, guru..."
                                     value="<?= htmlspecialchars($cari); ?>">
-                            </div>
-
-                            <div class="col-md-3">
-                                <label for="status" class="form-label">
-                                    Filter Status
-                                </label>
-
-                                <select name="status" id="status"
-                                        class="form-select">
-                                    <option value="">Semua Status</option>
-
-                                    <option value="belum"
-                                        <?= $status == 'belum' ? 'selected' : ''; ?>>
-                                        Belum Ditindak
-                                    </option>
-
-                                    <option value="selesai"
-                                        <?= $status == 'selesai' ? 'selected' : ''; ?>>
-                                        Selesai
-                                    </option>
-                                </select>
                             </div>
 
                             <div class="col-md-3 d-flex align-items-end gap-2">

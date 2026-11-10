@@ -118,10 +118,26 @@ if ($_SESSION['role'] === "admin") {
 
         <ul class="nav nav-pills flex-column">
 
+        
+
             <li class="nav-item mb-2">
                 <a href="dashboard.php"
                    class="nav-link <?= ($current_page == 'dashboard.php') ? 'active' : 'text-white' ?>">
                     Dashboard
+                </a>
+            </li>
+
+            <li class="nav-item mb-2">
+                <a href="catat_pelanggaran.php"
+                   class="nav-link <?= ($current_page == 'catat_pelanggaran.php') ? 'active' : 'text-white' ?>">
+                    Catat Pelanggaran
+                </a>
+            </li>
+
+            <li class="nav-item mb-2">
+                <a href="tindakan.php"
+                   class="nav-link <?= ($current_page == 'tindakan.php') ? 'active' : 'text-white' ?>">
+                    Tindakan
                 </a>
             </li>
 
@@ -131,6 +147,7 @@ if ($_SESSION['role'] === "admin") {
                     Laporan
                 </a>
             </li>
+            
 
             <li class="nav-item mb-2">
                 <a href="riwayat.php"
