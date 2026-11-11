@@ -129,7 +129,7 @@ if ($_SESSION['role'] === "admin") {
 
             <li class="nav-item mb-2">
                 <a href="catat_pelanggaran.php"
-                   class="nav-link <?= ($current_page == 'catat_pelanggaran.php') ? 'active' : 'text-white' ?>">
+                   class="nav-link <?= in_array($current_page, ['catat_pelanggaran.php','edit_catat_pelanggaran.php']) ? 'active' : 'text-white' ?>">
                     Catat Pelanggaran
                 </a>
             </li>
@@ -194,7 +194,7 @@ if ($_SESSION['role'] === "admin") {
 
             <li class="nav-item mb-2">
                 <a href="catat_pelanggaran.php"
-                   class="nav-link <?= ($current_page == 'catat_pelanggaran.php') ? 'active' : 'text-white' ?>">
+                   class="nav-link <?= in_array($current_page, ['catat_pelanggaran.php','edit_catat_pelanggaran.php']) ? 'active' : 'text-white' ?>">
                     Catat Pelanggaran
                 </a>
             </li>
