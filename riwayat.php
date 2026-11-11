@@ -5,55 +5,125 @@
 // Memeriksa session login
 include 'includes/cek_session.php';
 
-// Menghubungkan ke database
+// Menghubungkan database
 include 'config/koneksi.php';
 
-// Data wali kelas dari session (tetap dipertahankan)
-$is_wali = !empty($_SESSION['is_wali_kelas']);
-$guru_id = (int) ($_SESSION['guru_id'] ?? 0);
+// ======================================
+// MENGAMBIL IDENTITAS GURU DARI SESSION
+// ======================================
 
-// Mengambil kata pencarian
+$guru_id = (int) (
+    $_SESSION['guru_id']
+    ?? $_SESSION['id_guru']
+    ?? 0
+);
+
+$nama_login = trim(
+    $_SESSION['nama_guru']
+    ?? $_SESSION['nama']
+    ?? $_SESSION['username']
+    ?? ''
+);
+
+// ======================================
+// PENCARIAN
+// ======================================
+
 $cari = isset($_GET['cari'])
-    ? mysqli_real_escape_string($koneksi, trim($_GET['cari']))
+    ? trim($_GET['cari'])
     : '';
 
-// Query dasar: riwayat hanya berisi pelanggaran yang sudah ditindak
-// (status menjadi "selesai" saat tindakan disimpan di halaman Tindakan)
-$sql = "SELECT *
-        FROM t_pelanggaran_siswa
-        WHERE LOWER(TRIM(IFNULL(status, ''))) = 'selesai'";
+// ======================================
+// QUERY RIWAYAT
+// ======================================
 
-// Semua kelas dapat melihat riwayat pelanggaran.
-// Tidak ada pembatasan berdasarkan kelas wali.
+// Identitas guru harus tersedia
+if ($nama_login == '') {
 
-// Pencarian berdasarkan nama siswa, pelanggaran, kelas, atau guru
-if ($cari != '') {
-    $sql .= " AND (
-        nama_siswa LIKE '%$cari%'
-        OR nama_pelanggaran LIKE '%$cari%'
-        OR nama_kelas LIKE '%$cari%'
-        OR nama_guru LIKE '%$cari%'
-    )";
+    $query = false;
+    $jumlah = 0;
+    $error_identitas = true;
+
+} else {
+
+    $error_identitas = false;
+
+    // Hanya mengambil pelanggaran yang sudah selesai
+    $sql = "SELECT *
+            FROM t_pelanggaran_siswa
+            WHERE LOWER(TRIM(IFNULL(status, ''))) = 'selesai'
+            AND nama_guru = ?";
+
+    // Pencarian
+    if ($cari != '') {
+
+        $sql .= " AND (
+            nama_siswa LIKE ?
+            OR nama_pelanggaran LIKE ?
+            OR nama_kelas LIKE ?
+            OR nama_guru LIKE ?
+        )";
+
+    }
+
+    // Urutkan tanggal terbaru
+    $sql .= " ORDER BY tanggal DESC, id DESC";
+
+    // Prepared statement
+    $stmt = mysqli_prepare($koneksi, $sql);
+
+    if (!$stmt) {
+        die('Gagal menyiapkan query: ' . mysqli_error($koneksi));
+    }
+
+    // Bind parameter
+    if ($cari != '') {
+
+        $keyword = '%' . $cari . '%';
+
+        mysqli_stmt_bind_param(
+            $stmt,
+            "sssss",
+            $nama_login,
+            $keyword,
+            $keyword,
+            $keyword,
+            $keyword
+        );
+
+    } else {
+
+        mysqli_stmt_bind_param(
+            $stmt,
+            "s",
+            $nama_login
+        );
+
+    }
+
+    // Jalankan query
+    mysqli_stmt_execute($stmt);
+
+    // Ambil hasil
+    $query = mysqli_stmt_get_result($stmt);
+
+    if (!$query) {
+        die('Gagal mengambil data riwayat.');
+    }
+
+    // Hitung jumlah data
+    $jumlah = mysqli_num_rows($query);
 }
 
-// Urutkan berdasarkan tanggal terbaru
-$sql .= " ORDER BY tanggal DESC, id DESC";
-
-// Menjalankan query
-$query = mysqli_query($koneksi, $sql);
-
-if (!$query) {
-    die('Gagal mengambil data: ' . mysqli_error($koneksi));
-}
-
-// Menghitung jumlah data sesuai filter
-$jumlah = mysqli_num_rows($query);
 ?>
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>Riwayat Pelanggaran Siswa</title>
@@ -65,11 +135,13 @@ $jumlah = mysqli_num_rows($query);
     <!-- DataTables Bootstrap 5 -->
     <link href="https://cdn.datatables.net/2.3.4/css/dataTables.bootstrap5.min.css"
           rel="stylesheet">
+
 </head>
 
 <body>
 
 <div class="container-fluid">
+
     <div class="row">
 
         <?php include 'layout/sidebar.php'; ?>
@@ -77,195 +149,278 @@ $jumlah = mysqli_num_rows($query);
         <!-- KONTEN -->
         <main class="col-md-9 col-lg-10 p-4">
 
-            <!-- Judul halaman -->
+            <!-- JUDUL -->
             <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+
                 <div>
-                    <h2>Riwayat Pelanggaran Siswa</h2>
+
+                    <h2 class="fw-bold">
+                        Riwayat Pelanggaran Siswa
+                    </h2>
+
                     <p class="text-muted mb-0">
-                        Daftar pelanggaran siswa yang sudah ditindak dari semua kelas.
+                        Daftar pelanggaran yang Anda laporkan dan sudah ditindak.
                     </p>
+
                 </div>
 
                 <a href="dashboard.php" class="btn btn-secondary">
                     Kembali ke Dashboard
                 </a>
+
             </div>
 
-            <!-- Ringkasan jumlah data -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <h6 class="text-muted">Jumlah Riwayat Ditampilkan</h6>
-                    <h3 class="fw-bold text-primary">
-                        <?= $jumlah; ?> data
-                    </h3>
-                </div>
-            </div>
+            <?php if ($error_identitas) { ?>
 
-            <!-- Pencarian dan filter -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Pencarian dan Filter Riwayat</h5>
-                </div>
+                <!-- PERINGATAN SESSION -->
+                <div class="alert alert-warning">
 
-                <div class="card-body">
-                    <form method="GET" action="riwayat.php">
-                        <div class="row g-3">
+                    <h5 class="alert-heading">
+                        Identitas Guru Belum Ditemukan
+                    </h5>
 
-                            <div class="col-md-9">
-                                <label for="cari" class="form-label">
-                                    Cari Riwayat
-                                </label>
+                    <p class="mb-2">
+                        Sistem belum dapat membaca nama guru yang sedang login.
+                    </p>
 
-                                <input
-                                    type="text"
-                                    name="cari"
-                                    id="cari"
-                                    class="form-control"
-                                    placeholder="Nama siswa, pelanggaran, kelas, guru..."
-                                    value="<?= htmlspecialchars($cari); ?>">
-                            </div>
+                    <p class="mb-0">
+                        Silakan periksa nama session pada proses login.
+                        Riwayat tidak ditampilkan demi keamanan data.
+                    </p>
 
-                            <div class="col-md-3 d-flex align-items-end gap-2">
-                                <button type="submit" class="btn btn-primary">
-                                    Cari
-                                </button>
-
-                                <a href="riwayat.php" class="btn btn-secondary">
-                                    Reset
-                                </a>
-                            </div>
-
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Tabel riwayat -->
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Data Riwayat Pelanggaran</h5>
                 </div>
 
-                <div class="card-body">
-                    <div class="table-responsive">
+            <?php } else { ?>
 
-                        <table id="tabelRiwayat"
-                               class="table table-striped table-bordered table-hover align-middle">
+                <!-- INFORMASI GURU -->
+                <div class="alert alert-info">
 
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>No</th>
-                                    <th>Tanggal</th>
-                                    <th>Nama Siswa</th>
-                                    <th>Kelas</th>
-                                    <th>Jenis Pelanggaran</th>
-                                    <th>Poin</th>
-                                    <th>Guru Pencatat</th>
-                                    <th>Keterangan</th>
-                                    <th>Tindakan</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
+                    <strong>Guru Pelapor:</strong>
+                    <?= htmlspecialchars($nama_login); ?>
 
-                            <tbody>
-                                <?php while ($data = mysqli_fetch_assoc($query)) { ?>
-                                    <tr>
-                                        <!-- Nomor diisi otomatis oleh DataTables -->
-                                        <td></td>
+                    <br>
 
-                                        <td>
-                                            <?= htmlspecialchars($data['tanggal'] ?? '-'); ?>
-                                        </td>
+                    <small>
+                        Anda hanya dapat melihat pelanggaran yang Anda laporkan sendiri.
+                    </small>
 
-                                        <td>
-                                            <?= htmlspecialchars($data['nama_siswa'] ?? '-'); ?>
-                                        </td>
+                </div>
 
-                                        <td>
-                                            <?= htmlspecialchars($data['nama_kelas'] ?? '-'); ?>
-                                        </td>
+                <!-- JUMLAH RIWAYAT -->
+                <div class="card shadow-sm mb-4">
 
-                                        <td>
-                                            <?= htmlspecialchars($data['nama_pelanggaran'] ?? '-'); ?>
-                                        </td>
+                    <div class="card-body">
 
-                                        <td class="text-center">
-                                            <span class="badge bg-warning text-dark">
-                                                <?= htmlspecialchars((string) ($data['poin'] ?? 0)); ?>
-                                            </span>
-                                        </td>
+                        <h6 class="text-muted">
+                            Jumlah Riwayat Pelanggaran Anda
+                        </h6>
 
-                                        <td>
-                                            <?= htmlspecialchars($data['nama_guru'] ?? '-'); ?>
-                                        </td>
-
-                                        <td>
-                                            <?= htmlspecialchars($data['keterangan'] ?? '-'); ?>
-                                        </td>
-
-                                        <td>
-                                            <?= htmlspecialchars($data['tindakan'] ?? '-'); ?>
-                                        </td>
-
-                                        <td>
-                                            <?php
-                                            $status_data = strtolower(
-                                                trim($data['status'] ?? '')
-                                            );
-
-                                            if ($status_data == 'selesai') {
-                                                echo '<span class="badge bg-success">Selesai</span>';
-                                            } elseif (
-                                                $status_data == 'belum' ||
-                                                $status_data == 'belum ditindak'
-                                            ) {
-                                                echo '<span class="badge bg-danger">Belum Ditindak</span>';
-                                            } else {
-                                                echo '<span class="badge bg-secondary">'
-                                                    . htmlspecialchars($data['status'] ?? '-')
-                                                    . '</span>';
-                                            }
-                                            ?>
-                                        </td>
-                                    </tr>
-                                <?php } ?>
-                            </tbody>
-
-                        </table>
+                        <h3 class="fw-bold text-primary">
+                            <?= $jumlah; ?> data
+                        </h3>
 
                     </div>
+
                 </div>
-            </div>
+
+                <!-- PENCARIAN -->
+                <div class="card shadow-sm mb-4">
+
+                    <div class="card-header bg-primary text-white">
+
+                        <h5 class="mb-0">
+                            Pencarian dan Filter Riwayat
+                        </h5>
+
+                    </div>
+
+                    <div class="card-body">
+
+                        <form method="GET" action="riwayat.php">
+
+                            <div class="row g-3">
+
+                                <div class="col-md-9">
+
+                                    <label for="cari" class="form-label">
+                                        Cari Riwayat
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        name="cari"
+                                        id="cari"
+                                        class="form-control"
+                                        placeholder="Nama siswa, pelanggaran, kelas..."
+                                        value="<?= htmlspecialchars($cari); ?>">
+
+                                </div>
+
+                                <div class="col-md-3 d-flex align-items-end gap-2">
+
+                                    <button type="submit" class="btn btn-primary">
+                                        Cari
+                                    </button>
+
+                                    <a href="riwayat.php" class="btn btn-secondary">
+                                        Reset
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+                <!-- TABEL RIWAYAT -->
+                <div class="card shadow-sm">
+
+                    <div class="card-header bg-primary text-white">
+
+                        <h5 class="mb-0">
+                            Data Riwayat Pelanggaran
+                        </h5>
+
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="table-responsive">
+
+                            <table id="tabelRiwayat"
+                                   class="table table-striped table-bordered table-hover align-middle">
+
+                                <thead class="table-dark">
+
+                                    <tr>
+
+                                        <th>No</th>
+                                        <th>Tanggal</th>
+                                        <th>Nama Siswa</th>
+                                        <th>Kelas</th>
+                                        <th>Jenis Pelanggaran</th>
+                                        <th>Poin</th>
+                                        <th>Guru Pelapor</th>
+                                        <th>Keterangan</th>
+                                        <th>Tindakan</th>
+                                        <th>Status</th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody>
+
+                                    <?php while ($data = mysqli_fetch_assoc($query)) { ?>
+
+                                        <tr>
+
+                                            <td></td>
+
+                                            <td>
+                                                <?= htmlspecialchars($data['tanggal'] ?? '-'); ?>
+                                            </td>
+
+                                            <td>
+                                                <?= htmlspecialchars($data['nama_siswa'] ?? '-'); ?>
+                                            </td>
+
+                                            <td>
+                                                <?= htmlspecialchars($data['nama_kelas'] ?? '-'); ?>
+                                            </td>
+
+                                            <td>
+                                                <?= htmlspecialchars($data['nama_pelanggaran'] ?? '-'); ?>
+                                            </td>
+
+                                            <td class="text-center">
+
+                                                <span class="badge bg-warning text-dark">
+
+                                                    <?= htmlspecialchars(
+                                                        (string) ($data['poin'] ?? 0)
+                                                    ); ?>
+
+                                                </span>
+
+                                            </td>
+
+                                            <td>
+                                                <?= htmlspecialchars($data['nama_guru'] ?? '-'); ?>
+                                            </td>
+
+                                            <td>
+                                                <?= htmlspecialchars($data['keterangan'] ?? '-'); ?>
+                                            </td>
+
+                                            <td>
+                                                <?= htmlspecialchars($data['tindakan'] ?? '-'); ?>
+                                            </td>
+
+                                            <td>
+
+                                                <span class="badge bg-success">
+                                                    Selesai
+                                                </span>
+
+                                            </td>
+
+                                        </tr>
+
+                                    <?php } ?>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            <?php } ?>
 
         </main>
+
     </div>
+
 </div>
 
-<!-- jQuery -->
+<!-- JQUERY -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-<!-- Bootstrap 5 JS -->
+<!-- BOOTSTRAP JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- DataTables JS -->
+<!-- DATATABLES -->
 <script src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js"></script>
+
 <script src="https://cdn.datatables.net/2.3.4/js/dataTables.bootstrap5.min.js"></script>
 
-<!-- Inisialisasi DataTables -->
+<!-- INISIALISASI -->
 <script>
+
 $(document).ready(function () {
+
     $('#tabelRiwayat').DataTable({
+
         pageLength: 10,
+
         lengthMenu: [5, 10, 25, 50, 100],
 
         searching: true,
+
         ordering: true,
+
         paging: true,
 
-        // Urutkan berdasarkan tanggal terbaru
         order: [[1, 'desc']],
 
-        // Kolom No tidak diurutkan dan tidak dicari
         columnDefs: [
             {
                 orderable: false,
@@ -274,37 +429,62 @@ $(document).ready(function () {
             }
         ],
 
-        // Nomor urut menyesuaikan pencarian dan halaman
         drawCallback: function () {
+
             var api = this.api();
+
             var nomorAwal = api.page.info().start;
 
             api.column(0, {
                 search: 'applied',
                 order: 'applied'
             }).nodes().each(function (cell, i) {
+
                 cell.innerHTML = nomorAwal + i + 1;
+
             });
+
         },
 
         language: {
+
             search: "Cari di tabel:",
+
             lengthMenu: "Tampilkan _MENU_ data",
+
             info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+
             infoEmpty: "Tidak ada data riwayat",
+
             infoFiltered: "(difilter dari _MAX_ total data)",
+
             zeroRecords: "Riwayat pelanggaran tidak ditemukan",
+
             emptyTable: "Belum ada riwayat pelanggaran",
+
             paginate: {
                 first: "Pertama",
                 last: "Terakhir",
                 next: "Berikutnya",
                 previous: "Sebelumnya"
             }
+
         }
+
     });
+
 });
+
 </script>
 
 </body>
 </html>
+
+<?php
+
+// Menutup statement jika tersedia
+if (isset($stmt)) {
+    mysqli_stmt_close($stmt);
+}
+
+?>
