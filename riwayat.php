@@ -1,3 +1,4 @@
+
 <?php
 // riwayat.php
 
@@ -7,7 +8,7 @@ include 'includes/cek_session.php';
 // Menghubungkan ke database
 include 'config/koneksi.php';
 
-// Data wali kelas dari session (diisi saat login)
+// Data wali kelas dari session (tetap dipertahankan)
 $is_wali = !empty($_SESSION['is_wali_kelas']);
 $guru_id = (int) ($_SESSION['guru_id'] ?? 0);
 
@@ -22,17 +23,8 @@ $sql = "SELECT *
         FROM t_pelanggaran_siswa
         WHERE LOWER(TRIM(IFNULL(status, ''))) = 'selesai'";
 
-// Wali kelas hanya melihat riwayat dari kelas yang diampunya
-if ($is_wali) {
-    $sql .= " AND EXISTS (
-        SELECT 1
-        FROM t_wali_kelas wk
-        WHERE wk.guru_id = $guru_id
-          AND wk.kelas_id = t_pelanggaran_siswa.kelas_id
-          AND wk.tahun_ajaran_id = t_pelanggaran_siswa.tahun_ajaran_id
-          AND wk.status_aktif = 1
-    )";
-}
+// Semua kelas dapat melihat riwayat pelanggaran.
+// Tidak ada pembatasan berdasarkan kelas wali.
 
 // Pencarian berdasarkan nama siswa, pelanggaran, kelas, atau guru
 if ($cari != '') {
@@ -90,15 +82,13 @@ $jumlah = mysqli_num_rows($query);
                 <div>
                     <h2>Riwayat Pelanggaran Siswa</h2>
                     <p class="text-muted mb-0">
-                        Daftar pelanggaran siswa yang sudah ditindak.
+                        Daftar pelanggaran siswa yang sudah ditindak dari semua kelas.
                     </p>
                 </div>
 
-                <?php if (true) { ?>
-                    <a href="dashboard.php" class="btn btn-secondary">
-                        Kembali ke Dashboard
-                    </a>
-                <?php } ?>
+                <a href="dashboard.php" class="btn btn-secondary">
+                    Kembali ke Dashboard
+                </a>
             </div>
 
             <!-- Ringkasan jumlah data -->
@@ -149,7 +139,7 @@ $jumlah = mysqli_num_rows($query);
                     </form>
                 </div>
             </div>
-            
+
             <!-- Tabel riwayat -->
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
@@ -275,7 +265,7 @@ $(document).ready(function () {
         // Urutkan berdasarkan tanggal terbaru
         order: [[1, 'desc']],
 
-        // Kolom No tidak diurutkan dan kolom No tidak dicari
+        // Kolom No tidak diurutkan dan tidak dicari
         columnDefs: [
             {
                 orderable: false,

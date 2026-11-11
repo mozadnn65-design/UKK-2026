@@ -7,16 +7,6 @@
 include 'includes/cek_session.php';
 include 'config/koneksi.php';
 
-// Data wali kelas dari session (diisi saat login)
-$is_wali = !empty($_SESSION['is_wali_kelas']);
-$guru_id = (int) ($_SESSION['guru_id'] ?? 0);
-
-// Subquery daftar kelas yang diampu wali kelas ini
-$kelas_wali_sql = "SELECT kelas_id
-                   FROM t_wali_kelas
-                   WHERE guru_id = $guru_id
-                     AND status_aktif = 1";
-
 // ============================================
 // 2. MENGAMBIL INPUT PENCARIAN DAN FILTER
 // ============================================
@@ -34,17 +24,12 @@ $kelas_sql = mysqli_real_escape_string($koneksi, $kelas_filter);
 // ============================================
 // 3. MENGAMBIL DATA KELAS UNTUK FILTER
 // ============================================
-$sql_kelas = "SELECT id, nama
-              FROM t_kelas";
-
-// Wali kelas hanya bisa memilih kelas yang diampunya
-if ($is_wali) {
-    $sql_kelas .= " WHERE id IN ($kelas_wali_sql)";
-}
-
-$sql_kelas .= " ORDER BY nama ASC";
-
-$query_kelas = mysqli_query($koneksi, $sql_kelas);
+$query_kelas = mysqli_query(
+    $koneksi,
+    "SELECT id, nama
+     FROM t_kelas
+     ORDER BY nama ASC"
+);
 
 if (!$query_kelas) {
     die("Gagal mengambil data kelas: " . mysqli_error($koneksi));
@@ -89,13 +74,6 @@ $sql = "SELECT
         LEFT JOIN t_kelas k ON k.id = ks.kelas_id
 
         WHERE 1=1";
-
-// ============================================
-// 4b. WALI KELAS HANYA MELIHAT SISWA KELASNYA
-// ============================================
-if ($is_wali) {
-    $sql .= " AND k.id IN ($kelas_wali_sql)";
-}
 
 // ============================================
 // 5. PENCARIAN SISWA
@@ -195,13 +173,7 @@ $jumlah_siswa = count($data_rekap);
 <div class="container-fluid">
     <div class="row">
 
-        <?php
-        // Sidebar disembunyikan saat dicetak memakai class Bootstrap d-print-none
-        ob_start();
-        include 'layout/sidebar.php';
-        $sidebar_html = ob_get_clean();
-        echo preg_replace('/class="/', 'class="d-print-none ', $sidebar_html, 1);
-        ?>
+        <?php include 'layout/sidebar.php'; ?>
 
         <!-- KONTEN -->
         <main class="col-md-9 col-lg-10 p-4">
@@ -218,11 +190,9 @@ $jumlah_siswa = count($data_rekap);
                     </div>
 
                     <div class="d-flex gap-2 no-print">
-                        <?php if (true) { ?>
-                            <a href="dashboard.php" class="btn btn-secondary">
-                                Kembali ke Dashboard
-                            </a>
-                        <?php } ?>
+                        <a href="dashboard.php" class="btn btn-secondary">
+                            Kembali ke Dashboard
+                        </a>
 
                         <button type="button"
                                 onclick="window.print()"
@@ -303,9 +273,7 @@ $jumlah_siswa = count($data_rekap);
 
                                     <select name="kelas" id="kelas"
                                             class="form-select">
-                                        <option value="">
-                                            <?= $is_wali ? 'Semua Kelas Saya' : 'Semua Kelas'; ?>
-                                        </option>
+                                        <option value="">Semua Kelas</option>
 
                                         <?php foreach ($data_kelas as $kelas) { ?>
                                             <option

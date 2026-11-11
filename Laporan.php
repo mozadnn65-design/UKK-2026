@@ -271,12 +271,16 @@ $hasil = mysqli_stmt_get_result($stmt);
 
                     <span>Data Laporan Pelanggaran</span>
 
-                    <button type="button"
-                        onclick="window.print()"
-                        class="btn btn-light btn-sm no-print">
-                        Cetak Laporan
-                    </button>
+<a href="cetak_laporan.php?<?= http_build_query([
+    'tanggal_mulai' => $tanggal_mulai,
+    'tanggal_selesai' => $tanggal_selesai
+]); ?>"
+   class="btn btn-primary"
+   target="_blank">
 
+    Cetak Laporan
+
+</a>
                 </div>
 
                 <div class="card-body">
