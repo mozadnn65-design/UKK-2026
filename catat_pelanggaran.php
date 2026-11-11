@@ -257,6 +257,21 @@ $hasil = mysqli_query($koneksi, $sql);
                                        required>
                             </div>
 
+                            <!-- STATUS -->
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    Status <span class="text-danger">*</span>
+                                </label>
+
+                                <select name="status"
+                                        class="form-select"
+                                        required>
+                                    <option value="Ditindaklanjuti" selected>Ditindaklanjuti</option>
+                                    <option value="Proses">Proses</option>
+                                    <option value="Selesai">Selesai</option>
+                                </select>
+                            </div>
+
                             <!-- GURU PELAPOR -->
                             <?php if ($guru_login > 0) { ?>
 
@@ -264,6 +279,17 @@ $hasil = mysqli_query($koneksi, $sql);
                                 <input type="hidden"
                                        name="guru_id"
                                        value="<?php echo $guru_login; ?>">
+
+                            <?php } elseif (($_SESSION['role'] ?? '') === 'guru') { ?>
+
+                                <!-- Akun guru tapi belum terhubung ke data guru (t_guru) -->
+                                <div class="col-12">
+                                    <div class="alert alert-warning mb-0">
+                                        Akun ini belum terhubung ke data guru, jadi guru pelapor
+                                        tidak bisa ditentukan otomatis. Hubungi admin untuk
+                                        menghubungkan akun ini ke data guru.
+                                    </div>
+                                </div>
 
                             <?php } else { ?>
 
@@ -316,7 +342,6 @@ $hasil = mysqli_query($koneksi, $sql);
                         <!-- Diisi otomatis (tidak perlu diisi manual) -->
                         <input type="hidden" name="poin" id="poin">
                         <input type="hidden" name="pelanggaran_kategori_id" id="kategori">
-                        <input type="hidden" name="status" value="belum">
                         <input type="hidden" name="tindakan" value="">
 
                     </div>
@@ -331,7 +356,14 @@ $hasil = mysqli_query($koneksi, $sql);
 
                         <button type="submit"
                                 class="btn btn-primary px-4"
-                                <?php echo $tahun_aktif ? '' : 'disabled'; ?>>
+                                <?php
+                                // Simpan dinonaktifkan jika tahun ajaran aktif tidak ada,
+                                // atau akun guru belum terhubung ke data guru
+                                $akun_guru_belum_terhubung =
+                                    ($_SESSION['role'] ?? '') === 'guru' && $guru_login === 0;
+
+                                echo ($tahun_aktif && !$akun_guru_belum_terhubung) ? '' : 'disabled';
+                                ?>>
                             Simpan Pelanggaran
                         </button>
 
@@ -364,6 +396,7 @@ $hasil = mysqli_query($koneksi, $sql);
                                     <th>Tanggal</th>
                                     <th>Poin</th>
                                     <th>Status</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
 
@@ -423,6 +456,27 @@ $hasil = mysqli_query($koneksi, $sql);
                                                 . '</span>';
                                         }
                                         ?>
+                                    </td>
+
+                                    <td>
+                                        <?php if ($status_data != 'selesai') { ?>
+
+                                            <a href="edit_catat_pelanggaran.php?id=<?php echo (int) $row['id']; ?>"
+                                               class="btn btn-warning btn-sm">
+                                                Edit
+                                            </a>
+
+                                            <a href="hapus_pelanggaran.php?id=<?php echo (int) $row['id']; ?>"
+                                               class="btn btn-danger btn-sm"
+                                               onclick="return confirm('Yakin ingin menghapus pelanggaran ini?')">
+                                                Hapus
+                                            </a>
+
+                                        <?php } else { ?>
+
+                                            <span class="text-muted">-</span>
+
+                                        <?php } ?>
                                     </td>
 
                                 </tr>
@@ -542,6 +596,12 @@ $(document).ready(function () {
             {
                 className: 'text-nowrap',
                 targets: 6
+            },
+            {
+                orderable: false,
+                searchable: false,
+                className: 'text-center text-nowrap',
+                targets: 9
             }
         ],
 

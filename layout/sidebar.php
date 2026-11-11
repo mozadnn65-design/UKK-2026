@@ -142,14 +142,6 @@ if ($_SESSION['role'] === "admin") {
             </li>
 
             <li class="nav-item mb-2">
-                <a href="laporan.php"
-                   class="nav-link <?= ($current_page == 'laporan.php') ? 'active' : 'text-white' ?>">
-                    Laporan
-                </a>
-            </li>
-            
-
-            <li class="nav-item mb-2">
                 <a href="riwayat.php"
                    class="nav-link <?= ($current_page == 'riwayat.php') ? 'active' : 'text-white' ?>">
                     Riwayat
@@ -160,6 +152,13 @@ if ($_SESSION['role'] === "admin") {
                 <a href="rekap_poin.php"
                    class="nav-link <?= ($current_page == 'rekap_poin.php') ? 'active' : 'text-white' ?>">
                     Rekap Poin
+                </a>
+            </li>
+
+            <li class="nav-item mb-2">
+                <a href="laporan.php"
+                   class="nav-link <?= ($current_page == 'laporan.php') ? 'active' : 'text-white' ?>">
+                    Laporan
                 </a>
             </li>
 
