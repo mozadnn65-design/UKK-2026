@@ -1,16 +1,19 @@
-
 <?php
 // proses_tambah_wali_kelas.php
 include 'includes/cek_session.php';
 include 'config/koneksi.php';
 
 // Ambil data dari form
-$guru_id = $_POST['guru_id'];
-$kelas_id = $_POST['kelas_id'];
+$guru_id         = $_POST['guru_id'];
+$kelas_id        = $_POST['kelas_id'];
 $tahun_ajaran_id = $_POST['tahun_ajaran_id'];
+$tanggal_mulai   = $_POST['tanggal_mulai'];
+$tanggal_selesai = $_POST['tanggal_selesai'];
+$status_aktif    = $_POST['status_aktif'];
 
 // Cek data kosong
-if ($guru_id == '' || $kelas_id == '' || $tahun_ajaran_id == '') {
+if ($guru_id == '' || $kelas_id == '' || $tahun_ajaran_id == '' ||
+    $tanggal_mulai == '' || $tanggal_selesai == '' || $status_aktif == '') {
     $_SESSION['pesan_error'] = "Semua data harus diisi!";
     header("Location: tambah_wali_kelas.php");
     exit;
@@ -18,9 +21,9 @@ if ($guru_id == '' || $kelas_id == '' || $tahun_ajaran_id == '') {
 
 // Simpan data wali kelas
 $sql = "INSERT INTO t_wali_kelas
-        (guru_id, kelas_id, tahun_ajaran_id, created_at, updated_at)
+        (guru_id, kelas_id, tahun_ajaran_id, tanggal_mulai, tanggal_selesai, status_aktif, created_at, updated_at)
         VALUES
-        ('$guru_id', '$kelas_id', '$tahun_ajaran_id', NOW(), NOW())";
+        ('$guru_id', '$kelas_id', '$tahun_ajaran_id', '$tanggal_mulai', '$tanggal_selesai', '$status_aktif', NOW(), NOW())";
 
 if (mysqli_query($koneksi, $sql)) {
     $_SESSION['pesan_sukses'] = "Wali kelas berhasil ditambahkan!";
