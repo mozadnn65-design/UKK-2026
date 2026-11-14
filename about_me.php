@@ -9,7 +9,7 @@ $sekolah = "SMK Muhammadiyah Tasikmalaya";
 $jurusan = "Rekayasa Perangkat Lunak";
 $hobi = "Mendengarkan musik, membaca novel, menyanyi";
 $cita_cita = "POLWAN";
-$foto = "img.jpeg";
+$foto = "assets\css/img.jpeg";
 ?>
 
 <!DOCTYPE html>

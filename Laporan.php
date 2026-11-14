@@ -10,11 +10,11 @@ date_default_timezone_set('Asia/Jakarta');
 // DATA SEKOLAH (ubah sesuai data sebenarnya)
 // =====================================================
 $nama_sekolah    = 'SMK MUHAMMADIYAH';
-$alamat_sekolah  = 'Jl. Contoh No. 123, Kecamatan ........, Kabupaten/Kota ........, Provinsi ........ 12345';
-$telepon_sekolah = '(0265) 000-0000';
-$email_sekolah   = 'smkmuhammadiyah@gmail.com';
+$alamat_sekolah  = 'Jl. Rumah Sakit No. 29, Kelurahan Empangsari, Kecamatan Tawang, Kota Tasikmalaya, Jawa Barat 46113';
+$telepon_sekolah = '(0265) 327380';
+$email_sekolah   = 'smksmuhammadiyahtsm@gmail.com';
 $kota_ttd        = 'Tasikmalaya';
-$logo_sekolah    = 'assets/img/logo.png'; // kosongkan '' jika tidak memakai logo
+$logo_sekolah    = 'assets\css/img.logo.png';
 
 // =====================================================
 // FUNGSI BANTU
@@ -34,6 +34,20 @@ if (!function_exists('tanggal_indo')) {
         }
 
         return date('d', $t) . ' ' . $bulan[(int) date('n', $t)] . ' ' . date('Y', $t);
+    }
+}
+
+// Tanggal dengan bulan berupa angka, contoh: 14-11-2026 (dipakai di cetak laporan)
+if (!function_exists('tanggal_angka')) {
+    function tanggal_angka($tgl)
+    {
+        $t = strtotime((string) $tgl);
+
+        if (!$t) {
+            return '-';
+        }
+
+        return date('d-m-Y', $t);
     }
 }
 
@@ -191,7 +205,7 @@ while ($row = mysqli_fetch_assoc($hasil)) {
 mysqli_stmt_close($stmt);
 
 $total         = count($laporan);
-$tanggal_cetak = tanggal_indo(date('Y-m-d'));
+$tanggal_cetak = tanggal_angka(date('Y-m-d'));
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -382,9 +396,9 @@ $tanggal_cetak = tanggal_indo(date('Y-m-d'));
                                         <td><?= teks($row['nama_guru']); ?></td>
 
                                         <!-- data-order supaya pengurutan memakai tanggal asli -->
-                                        <td class="text-nowrap"
-                                            data-order="<?= htmlspecialchars((string) ($row['tanggal'] ?? '')); ?>">
-                                            <?= !empty($row['tanggal']) ? htmlspecialchars(tanggal_indo($row['tanggal'])) : '-'; ?>
+                                        <!-- TANGGAL -->
+                                        <td>
+                                            <?= htmlspecialchars($row['tanggal'] ?? '-'); ?>
                                         </td>
 
                                         <!-- data-order supaya pengurutan memakai angka, bukan teks -->
@@ -480,9 +494,9 @@ $tanggal_cetak = tanggal_indo(date('Y-m-d'));
         <div>
             Periode:
             <?php if ($tanggal_mulai !== '' || $tanggal_selesai !== '') { ?>
-                <?= $tanggal_mulai !== '' ? htmlspecialchars(tanggal_indo($tanggal_mulai)) : 'Awal'; ?>
+                <?= $tanggal_mulai !== '' ? htmlspecialchars(tanggal_angka($tanggal_mulai)) : 'Awal'; ?>
                 s/d
-                <?= $tanggal_selesai !== '' ? htmlspecialchars(tanggal_indo($tanggal_selesai)) : 'Sekarang'; ?>
+                <?= $tanggal_selesai !== '' ? htmlspecialchars(tanggal_angka($tanggal_selesai)) : 'Sekarang'; ?>
             <?php } else { ?>
                 Semua Tanggal
             <?php } ?>
@@ -536,7 +550,7 @@ $tanggal_cetak = tanggal_indo(date('Y-m-d'));
                     <td><?= teks($row['nama_pelanggaran']); ?></td>
                     <td><?= teks($row['nama_guru']); ?></td>
                     <td class="text-center text-nowrap">
-                        <?= !empty($row['tanggal']) ? htmlspecialchars(tanggal_indo($row['tanggal'])) : '-'; ?>
+                        <?= !empty($row['tanggal']) ? htmlspecialchars(tanggal_angka($row['tanggal'])) : '-'; ?>
                     </td>
                     <td class="text-center"><?= (int) $row['poin']; ?></td>
                     <td><?= teks($row['tindakan']); ?></td>

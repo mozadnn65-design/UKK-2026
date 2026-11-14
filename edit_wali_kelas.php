@@ -1,4 +1,3 @@
-
 <?php
 // edit_wali_kelas.php
 include 'includes/cek_session.php';

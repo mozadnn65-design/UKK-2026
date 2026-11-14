@@ -1,4 +1,3 @@
-
 <?php
 // edit_penempatan_siswa.php
 include 'includes/cek_session.php';
@@ -17,9 +16,25 @@ if (!$row) {
 
 $siswa = mysqli_query($koneksi, "SELECT id, nis, nama FROM t_siswa ORDER BY nama ASC");
 $kelas = mysqli_query($koneksi, "SELECT id, nama FROM t_kelas ORDER BY nama ASC");
-$tahun = mysqli_query($koneksi, "SELECT id, nama FROM t_tahun_ajaran ORDER BY nama DESC");
-?>
 
+// Tahun ajaran: hanya yang aktif.
+// Tahun ajaran milik data ini tetap ikut ditampilkan (walau sudah tidak aktif) agar pilihan lama tidak hilang.
+$tahun_ajaran_lama = (int) ($row['tahun_ajaran_id'] ?? 0);
+
+$stmt_tahun = mysqli_prepare(
+    $koneksi,
+    "SELECT id, nama
+     FROM t_tahun_ajaran
+     WHERE status_aktif = 1
+        OR id = ?
+     ORDER BY nama DESC"
+);
+
+mysqli_stmt_bind_param($stmt_tahun, "i", $tahun_ajaran_lama);
+mysqli_stmt_execute($stmt_tahun);
+
+$tahun = mysqli_stmt_get_result($stmt_tahun);
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>

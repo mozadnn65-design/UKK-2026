@@ -1,4 +1,3 @@
-
 <?php
 // edit_pelanggaran_kategori.php
 
@@ -24,11 +23,43 @@ mysqli_stmt_execute($stmt);
 $hasil = mysqli_stmt_get_result($stmt);
 $data = mysqli_fetch_assoc($hasil);
 
+mysqli_stmt_close($stmt);
+
 if (!$data) {
     die("Data kategori pelanggaran tidak ditemukan.");
 }
-?>
 
+// =====================================================
+// KATEGORI LAIN (untuk cek nama & deskripsi yang sama)
+// =====================================================
+$nama_lain = [];
+$deskripsi_lain = [];
+
+$stmt_lain = mysqli_prepare(
+    $koneksi,
+    "SELECT nama, deskripsi FROM t_pelanggaran_kategori WHERE id <> ?"
+);
+
+mysqli_stmt_bind_param($stmt_lain, "i", $id);
+mysqli_stmt_execute($stmt_lain);
+
+$hasil_lain = mysqli_stmt_get_result($stmt_lain);
+
+while ($k = mysqli_fetch_assoc($hasil_lain)) {
+    $nama = mb_strtolower(trim(preg_replace('/\s+/', ' ', (string) $k['nama'])));
+    $deskripsi = mb_strtolower(trim(preg_replace('/\s+/', ' ', (string) ($k['deskripsi'] ?? ''))));
+
+    if ($nama !== '') {
+        $nama_lain[] = $nama;
+    }
+
+    if ($deskripsi !== '') {
+        $deskripsi_lain[] = $deskripsi;
+    }
+}
+
+mysqli_stmt_close($stmt_lain);
+?>
 <!DOCTYPE html>
 <html lang="id">
 
@@ -56,6 +87,39 @@ if (!$data) {
 
             <h1 class="mb-4">Edit Kategori Pelanggaran</h1>
 
+            <?php if (isset($_SESSION['pesan_sukses'])) { ?>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <?= htmlspecialchars($_SESSION['pesan_sukses']); ?>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="alert"
+                            aria-label="Tutup"></button>
+                </div>
+                <?php unset($_SESSION['pesan_sukses']); ?>
+            <?php } ?>
+
+            <?php if (isset($_SESSION['pesan_error'])) { ?>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <?= htmlspecialchars($_SESSION['pesan_error']); ?>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="alert"
+                            aria-label="Tutup"></button>
+                </div>
+                <?php unset($_SESSION['pesan_error']); ?>
+            <?php } ?>
+
+            <!-- Notifikasi kategori / deskripsi sudah ada -->
+            <div id="notifSama"
+                 class="alert alert-danger alert-dismissible d-none"
+                 role="alert">
+                <span id="teksNotif"></span>
+                <button type="button"
+                        class="btn-close"
+                        id="tutupNotif"
+                        aria-label="Tutup"></button>
+            </div>
+
             <div class="card shadow-sm">
 
                 <div class="card-header bg-primary text-white">
@@ -70,7 +134,7 @@ if (!$data) {
 
                         <input type="hidden"
                                name="id"
-                               value="<?= htmlspecialchars((string)$data['id']) ?>">
+                               value="<?= htmlspecialchars((string) $data['id']) ?>">
 
                         <!-- NAMA KATEGORI -->
                         <div class="mb-3">
@@ -110,13 +174,13 @@ if (!$data) {
                                     required>
 
                                 <option value="1"
-                                    <?= $data['status_aktif'] == 1
+                                    <?= (int) $data['status_aktif'] === 1
                                         ? 'selected' : '' ?>>
                                     Aktif
                                 </option>
 
                                 <option value="0"
-                                    <?= $data['status_aktif'] == 0
+                                    <?= (int) $data['status_aktif'] === 0
                                         ? 'selected' : '' ?>>
                                     Tidak Aktif
                                 </option>
@@ -145,6 +209,62 @@ if (!$data) {
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Cek nama & deskripsi yang sama dengan kategori lain -->
+<script>
+
+// Data kategori lain (huruf kecil) dari database, kategori ini sendiri tidak ikut
+const namaLain = <?= json_encode($nama_lain, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE); ?>;
+const deskripsiLain = <?= json_encode($deskripsi_lain, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE); ?>;
+
+const form = document.getElementById('formEditKategori');
+const inputNama = document.getElementById('nama');
+const inputDeskripsi = document.getElementById('deskripsi');
+const notif = document.getElementById('notifSama');
+const teksNotif = document.getElementById('teksNotif');
+
+// Huruf kecil, hapus spasi di pinggir, dan rapikan spasi ganda
+function rapikan(teks) {
+    return teks.trim().replace(/\s+/g, ' ').toLowerCase();
+}
+
+document.getElementById('tutupNotif').addEventListener('click', function () {
+    notif.classList.add('d-none');
+});
+
+form.addEventListener('submit', function (e) {
+    const nama = rapikan(inputNama.value);
+    const deskripsi = rapikan(inputDeskripsi.value);
+
+    const namaSama = nama !== '' && namaLain.includes(nama);
+    const deskripsiSama = deskripsi !== '' && deskripsiLain.includes(deskripsi);
+
+    let pesan = '';
+    let kolom = null;
+
+    if (namaSama && deskripsiSama) {
+        pesan = 'Nama kategori dan deskripsi sudah terdaftar.';
+        kolom = inputNama;
+    } else if (namaSama) {
+        pesan = 'Nama kategori sudah terdaftar.';
+        kolom = inputNama;
+    } else if (deskripsiSama) {
+        pesan = 'Deskripsi sudah terdaftar.';
+        kolom = inputDeskripsi;
+    }
+
+    if (pesan !== '') {
+        e.preventDefault();
+        teksNotif.textContent = pesan;
+        notif.classList.remove('d-none');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        kolom.focus();
+    } else {
+        notif.classList.add('d-none');
+    }
+});
+
+</script>
 
 </body>
 </html>

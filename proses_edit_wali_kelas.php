@@ -3,31 +3,47 @@
 include 'includes/cek_session.php';
 include 'config/koneksi.php';
 
-$id = $_POST['id'];
-$guru_id = $_POST['guru_id'];
-$kelas_id = $_POST['kelas_id'];
-$tahun_ajaran_id = $_POST['tahun_ajaran_id'];
+$id = (int) ($_POST['id'] ?? 0);
+$tahun_ajaran_id = (int) $_POST['tahun_ajaran_id'];
+$kelas_id = (int) $_POST['kelas_id'];
+$guru_id = (int) $_POST['guru_id'];
+$tanggal_mulai = $_POST['tanggal_mulai'];
+$tanggal_selesai = $_POST['tanggal_selesai'];
+$status_aktif = (int) $_POST['status_aktif'];
 
-if ($guru_id == '' || $kelas_id == '' || $tahun_ajaran_id == '') {
-    $_SESSION['pesan_error'] = "Semua data harus diisi!";
-    header("Location: edit_wali_kelas.php?id=$id");
-    exit;
+if ($tanggal_selesai < $tanggal_mulai) {
+    exit('Tanggal selesai tidak boleh lebih awal dari tanggal mulai.');
 }
 
 $sql = "UPDATE t_wali_kelas SET
-        guru_id = '$guru_id',
-        kelas_id = '$kelas_id',
-        tahun_ajaran_id = '$tahun_ajaran_id',
-        updated_at = NOW()
-        WHERE id = '$id'";
+        tahun_ajaran_id = ?,
+        kelas_id = ?,
+        guru_id = ?,
+        tanggal_mulai = ?,
+        tanggal_selesai = ?,
+        status_aktif = ?,
+        updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?";
 
-if (mysqli_query($koneksi, $sql)) {
-    $_SESSION['pesan_sukses'] = "Data wali kelas berhasil diubah!";
+$stmt = mysqli_prepare($koneksi, $sql);
+
+mysqli_stmt_bind_param(
+    $stmt,
+    "iiissii",
+    $tahun_ajaran_id,
+    $kelas_id,
+    $guru_id,
+    $tanggal_mulai,
+    $tanggal_selesai,
+    $status_aktif,
+    $id
+);
+
+if (mysqli_stmt_execute($stmt)) {
     header("Location: kelola_wali_kelas.php");
     exit;
 } else {
-    $_SESSION['pesan_error'] = "Data wali kelas gagal diubah!";
-    header("Location: edit_wali_kelas.php?id=$id");
-    exit;
+    echo "Gagal mengubah data wali kelas: "
+        . mysqli_stmt_error($stmt);
 }
 ?>

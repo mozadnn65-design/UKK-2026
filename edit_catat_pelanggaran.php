@@ -40,31 +40,27 @@ $guru_id_lama        = (int) $row['guru_id'];
 $kelas_id_lama       = (int) ($row['kelas_id'] ?? 0);
 
 // =====================================================
-// DAFTAR SISWA BESERTA KELASNYA
+// DATA SISWA (hanya ditampilkan, tidak bisa diubah)
 // =====================================================
 $stmt_siswa = mysqli_prepare(
     $koneksi,
-    "SELECT
-        s.id,
-        s.nis,
-        s.nama,
-        ks.kelas_id,
-        k.nama AS nama_kelas
+    "SELECT s.nis, s.nama, k.nama AS nama_kelas
      FROM t_siswa s
-     LEFT JOIN t_kelas_siswa ks
-        ON ks.siswa_id = s.id
-       AND ks.status_aktif = 1
-     LEFT JOIN t_kelas k
-        ON k.id = ks.kelas_id
-     WHERE (s.status_aktif = 1 AND ks.kelas_id IS NOT NULL)
-        OR s.id = ?
-     ORDER BY s.nama ASC"
+     LEFT JOIN t_kelas k ON k.id = ?
+     WHERE s.id = ?
+     LIMIT 1"
 );
 
-mysqli_stmt_bind_param($stmt_siswa, "i", $siswa_id_lama);
+mysqli_stmt_bind_param($stmt_siswa, "ii", $kelas_id_lama, $siswa_id_lama);
 mysqli_stmt_execute($stmt_siswa);
 
-$siswa = mysqli_stmt_get_result($stmt_siswa);
+$data_siswa = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt_siswa));
+
+mysqli_stmt_close($stmt_siswa);
+
+$label_siswa = $data_siswa
+    ? $data_siswa['nis'] . ' - ' . $data_siswa['nama'] . ' (' . ($data_siswa['nama_kelas'] ?? '-') . ')'
+    : 'Siswa tidak ditemukan';
 
 // =====================================================
 // DAFTAR PELANGGARAN
@@ -109,6 +105,12 @@ $tahun_ajaran_id = (int) ($row['tahun_ajaran_id'] ?? 0);
 $daftar_status = ['Ditindaklanjuti', 'Proses', 'Selesai'];
 
 $status_lama = (string) ($row['status'] ?? '');
+
+// =====================================================
+// TANGGAL (hanya ditampilkan, tidak bisa diubah)
+// =====================================================
+$tanggal_lama = !empty($row['tanggal']) ? date('Y-m-d', strtotime($row['tanggal'])) : '';
+$tanggal_tampil = $tanggal_lama !== '' ? date('d-m-Y', strtotime($tanggal_lama)) : '-';
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -176,46 +178,18 @@ $status_lama = (string) ($row['status'] ?? '');
 
                         <div class="row g-3">
 
-                            <!-- PILIH SISWA (bisa dicari) -->
+                            <!-- SISWA (tidak bisa diubah) -->
                             <div class="col-md-6">
-                                <label class="form-label">
-                                    Siswa <span class="text-danger">*</span>
-                                </label>
+                                <label class="form-label">Siswa</label>
 
-                                <select name="siswa_id"
-                                        id="siswa"
-                                        class="form-select"
-                                        required>
-
-                                    <option value="">-- Cari / Pilih Siswa --</option>
-
-                                    <?php while ($s = mysqli_fetch_assoc($siswa)) { ?>
-
-                                        <?php
-                                        $kelas_option = $s['kelas_id'] ?? '';
-
-                                        if ($kelas_option === '' && (int) $s['id'] === $siswa_id_lama) {
-                                            $kelas_option = $kelas_id_lama;
-                                        }
-                                        ?>
-
-                                        <option value="<?= (int) $s['id']; ?>"
-                                                data-kelas-id="<?= htmlspecialchars((string) $kelas_option); ?>"
-                                                <?= (int) $s['id'] === $siswa_id_lama ? 'selected' : ''; ?>>
-
-                                            <?= htmlspecialchars(
-                                                $s['nis'] . ' - ' . $s['nama'] .
-                                                ' (' . ($s['nama_kelas'] ?? '-') . ')'
-                                            ); ?>
-
-                                        </option>
-
-                                    <?php } ?>
-
-                                </select>
+                                <input type="text"
+                                       class="form-control"
+                                       value="<?= htmlspecialchars($label_siswa); ?>"
+                                       readonly
+                                       disabled>
 
                                 <div class="form-text">
-                                    Ketik nama atau NIS siswa. Kelas terisi otomatis.
+                                    Siswa tidak dapat diubah. Jika salah siswa, hapus catatan ini lalu buat yang baru.
                                 </div>
                             </div>
 
@@ -254,17 +228,19 @@ $status_lama = (string) ($row['status'] ?? '');
                                 </div>
                             </div>
 
-                            <!-- TANGGAL -->
+                            <!-- TANGGAL (tidak bisa diubah) -->
                             <div class="col-md-6">
-                                <label class="form-label">
-                                    Tanggal <span class="text-danger">*</span>
-                                </label>
+                                <label class="form-label">Tanggal</label>
 
-                                <input type="date"
-                                       name="tanggal"
+                                <input type="text"
                                        class="form-control"
-                                       value="<?= !empty($row['tanggal']) ? htmlspecialchars(date('Y-m-d', strtotime($row['tanggal']))) : ''; ?>"
-                                       required>
+                                       value="<?= htmlspecialchars($tanggal_tampil); ?>"
+                                       readonly
+                                       disabled>
+
+                                <div class="form-text">
+                                    Tanggal tidak dapat diubah.
+                                </div>
                             </div>
 
                             <!-- STATUS -->
@@ -299,15 +275,22 @@ $status_lama = (string) ($row['status'] ?? '');
 
                         </div>
 
-                        <!-- Diisi otomatis (tidak ditampilkan) -->
+                        <!-- Tetap seperti catatan awal (tidak bisa diubah) -->
                         <input type="hidden"
-                               name="guru_id"
-                               value="<?= $guru_id_lama; ?>">
+                               name="tanggal"
+                               value="<?= htmlspecialchars($tanggal_lama); ?>">
+
+                        <input type="hidden"
+                               name="siswa_id"
+                               value="<?= $siswa_id_lama; ?>">
 
                         <input type="hidden"
                                name="kelas_id"
-                               id="kelas"
                                value="<?= $kelas_id_lama; ?>">
+
+                        <input type="hidden"
+                               name="guru_id"
+                               value="<?= $guru_id_lama; ?>">
 
                         <input type="hidden"
                                name="tahun_ajaran_id"
@@ -356,34 +339,6 @@ $status_lama = (string) ($row['status'] ?? '');
 
 <!-- Tom Select JS -->
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
-
-<!-- JavaScript Siswa (bisa dicari, kelas otomatis) -->
-<script>
-
-const inputKelasId = document.getElementById('kelas');
-
-// Simpan kelas tiap siswa (dikirim otomatis lewat input tersembunyi)
-const dataSiswa = {};
-
-document.querySelectorAll('#siswa option').forEach(function (opsi) {
-    if (opsi.value !== '') {
-        dataSiswa[opsi.value] = {
-            kelasId: opsi.dataset.kelasId || ''
-        };
-    }
-});
-
-new TomSelect('#siswa', {
-    maxOptions: null,
-    placeholder: 'Ketik nama atau NIS siswa...',
-    onChange: function (nilai) {
-        const data = dataSiswa[nilai];
-
-        inputKelasId.value = data ? data.kelasId : '';
-    }
-});
-
-</script>
 
 <!-- JavaScript Jenis Pelanggaran (bisa dicari, poin & kategori otomatis) -->
 <script>
