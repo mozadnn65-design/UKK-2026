@@ -13,11 +13,11 @@ date_default_timezone_set('Asia/Jakarta');
 // DATA SEKOLAH (ubah sesuai data sebenarnya)
 // ============================================
 $nama_sekolah    = 'SMK MUHAMMADIYAH';
-$alamat_sekolah  = 'Jl. Contoh No. 123, Kecamatan ........, Kota Tasikmalaya, Jawa Barat 46xxx';
-$telepon_sekolah = '(0265) 000-0000';
-$email_sekolah   = 'smkmuhammadiyah@gmail.com';
+$alamat_sekolah  = 'Jl. Rumah Sakit No. 29, Kelurahan Empangsari, Kecamatan Tawang, Kota Tasikmalaya, Jawa Barat 46113';
+$telepon_sekolah = '(0265) 327380';
+$email_sekolah   = 'smksmuhammadiyahtsm@gmail.com';
 $kota_ttd        = 'Tasikmalaya';
-$logo_sekolah    = 'assets/img/logo.png'; // kosongkan '' jika tidak memakai logo
+$logo_sekolah    = 'assets\css/img.logo.png';
 
 // ============================================
 // FUNGSI BANTU
