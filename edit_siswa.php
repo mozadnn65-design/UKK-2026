@@ -3,12 +3,28 @@
 include 'includes/cek_session.php';
 include 'config/koneksi.php';
 
-// Ambil ID siswa dari URL
-$id = $_GET['id'];
+if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+    $_SESSION['pesan_error'] = "ID siswa tidak valid.";
+    header("Location: kelola_siswa.php");
+    exit;
+}
 
-// Ambil data siswa dari database
-$data = mysqli_query($koneksi, "SELECT * FROM t_siswa WHERE id='$id'");
+$id = (int) $_GET['id'];
+
+$stmt = mysqli_prepare($koneksi, "SELECT * FROM t_siswa WHERE id = ?");
+mysqli_stmt_bind_param($stmt, "i", $id);
+mysqli_stmt_execute($stmt);
+
+$data = mysqli_stmt_get_result($stmt);
 $siswa = mysqli_fetch_assoc($data);
+
+mysqli_stmt_close($stmt);
+
+if (!$siswa) {
+    $_SESSION['pesan_error'] = "Data siswa tidak ditemukan.";
+    header("Location: kelola_siswa.php");
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -22,6 +38,7 @@ $siswa = mysqli_fetch_assoc($data);
 </head>
 
 <body>
+
 <div class="container-fluid">
     <div class="row">
 
@@ -29,9 +46,10 @@ $siswa = mysqli_fetch_assoc($data);
 
         <main class="col-md-9 col-lg-10 p-4">
 
-            <h2>Edit Siswa</h2>
+            <h2 class="mb-4">Edit Siswa</h2>
 
             <div class="card shadow-sm">
+
                 <div class="card-header bg-primary text-white">
                     Form Edit Siswa
                 </div>
@@ -41,64 +59,91 @@ $siswa = mysqli_fetch_assoc($data);
                     <form action="proses_edit_siswa.php" method="POST">
 
                         <input type="hidden" name="id"
-                               value="<?= $siswa['id']; ?>">
+                               value="<?= (int)$siswa['id']; ?>">
 
                         <div class="mb-3">
                             <label class="form-label">NIS</label>
                             <input type="text" name="nis"
                                    class="form-control" maxlength="10"
-                                   value="<?= $siswa['nis']; ?>" required>
+                                   value="<?= htmlspecialchars($siswa['nis'] ?? ''); ?>"
+                                   required>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">NISN</label>
                             <input type="text" name="nisn"
                                    class="form-control" maxlength="10"
-                                   value="<?= $siswa['nisn']; ?>" required>
+                                   value="<?= htmlspecialchars($siswa['nisn'] ?? ''); ?>"
+                                   required>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Nama Siswa</label>
                             <input type="text" name="nama"
                                    class="form-control"
-                                   value="<?= $siswa['nama']; ?>" required>
+                                   value="<?= htmlspecialchars($siswa['nama'] ?? ''); ?>"
+                                   required>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label d-block">Jenis Kelamin</label>
 
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio"
-                                       name="jenis_kelamin" id="laki"
-                                       value="L" required>
-                                <label class="form-check-label" for="laki">Laki-laki</label>
+                                <input class="form-check-input"
+                                       type="radio"
+                                       name="jenis_kelamin"
+                                       id="laki"
+                                       value="L"
+                                       <?= $siswa['jenis_kelamin'] == 'L' ? 'checked' : ''; ?>
+                                       required>
+
+                                <label class="form-check-label" for="laki">
+                                    Laki-laki
+                                </label>
                             </div>
 
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio"
-                                       name="jenis_kelamin" id="perempuan"
-                                       value="P" required>
-                                <label class="form-check-label" for="perempuan">Perempuan</label>
+                                <input class="form-check-input"
+                                       type="radio"
+                                       name="jenis_kelamin"
+                                       id="perempuan"
+                                       value="P"
+                                       <?= $siswa['jenis_kelamin'] == 'P' ? 'checked' : ''; ?>
+                                       required>
+
+                                <label class="form-check-label" for="perempuan">
+                                    Perempuan
+                                </label>
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Tanggal Lahir</label>
-                            <input type="date" name="tanggal_lahir"
+
+                            <input type="date"
+                                   name="tanggal_lahir"
                                    class="form-control"
-                                   min="2000-01-01" max="<?= date('Y-m-d'); ?>"
-                                   value="<?= $siswa['tanggal_lahir']; ?>" required>
+                                   min="2000-01-01"
+                                   max="<?= date('Y-m-d'); ?>"
+                                   value="<?= htmlspecialchars($siswa['tanggal_lahir'] ?? ''); ?>"
+                                   required>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Alamat</label>
-                            <textarea name="alamat" class="form-control"
-                                      required><?= $siswa['alamat']; ?></textarea>
+
+                            <textarea name="alamat"
+                                      class="form-control"
+                                      required><?= htmlspecialchars($siswa['alamat'] ?? ''); ?></textarea>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Status Aktif</label>
-                            <select name="status_aktif" class="form-select" required>
+
+                            <select name="status_aktif"
+                                    class="form-select"
+                                    required>
+
                                 <option value="1"
                                     <?= $siswa['status_aktif'] == 1 ? 'selected' : ''; ?>>
                                     Aktif
@@ -108,6 +153,7 @@ $siswa = mysqli_fetch_assoc($data);
                                     <?= $siswa['status_aktif'] == 0 ? 'selected' : ''; ?>>
                                     Tidak Aktif
                                 </option>
+
                             </select>
                         </div>
 
@@ -127,5 +173,6 @@ $siswa = mysqli_fetch_assoc($data);
         </main>
     </div>
 </div>
+
 </body>
 </html>
