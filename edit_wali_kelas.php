@@ -3,6 +3,10 @@
 include 'includes/cek_session.php';
 include 'config/koneksi.php';
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 // Validasi ID
 $id = (int) ($_GET['id'] ?? 0);
 
@@ -26,11 +30,27 @@ if (!$data) {
     exit('Data wali kelas tidak ditemukan.');
 }
 
+// Pesan error dari proses (flash message) + isian lama
+$error = $_SESSION['error_wali_kelas'] ?? '';
+$old   = $_SESSION['old_wali_kelas'] ?? [];
+unset($_SESSION['error_wali_kelas'], $_SESSION['old_wali_kelas']);
+
+// Jika ada isian lama (karena error), pakai itu supaya form tidak reset
+if ($error && $old) {
+    $data = array_merge($data, $old);
+}
+
 // Ambil data pilihan
-$tahun = mysqli_query(
+// Tahun ajaran hanya yang aktif: 2026/2027
+$tahunAktifNama = '2026/2027';
+
+$stmtTahun = mysqli_prepare(
     $koneksi,
-    "SELECT id, nama FROM t_tahun_ajaran ORDER BY id DESC"
+    "SELECT id, nama FROM t_tahun_ajaran WHERE nama = ? ORDER BY id DESC"
 );
+mysqli_stmt_bind_param($stmtTahun, "s", $tahunAktifNama);
+mysqli_stmt_execute($stmtTahun);
+$tahun = mysqli_stmt_get_result($stmtTahun);
 
 $kelas = mysqli_query(
     $koneksi,
@@ -70,6 +90,17 @@ $guru = mysqli_query(
 
             <h1 class="mb-4">Edit Wali Kelas</h1>
 
+            <!-- NOTIFIKASI ERROR -->
+            <?php if ($error !== '') { ?>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <?= htmlspecialchars($error) ?>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="alert"
+                            aria-label="Close"></button>
+                </div>
+            <?php } ?>
+
             <div class="card shadow-sm">
 
                 <div class="card-header bg-primary text-white">
@@ -84,7 +115,7 @@ $guru = mysqli_query(
 
                         <input type="hidden"
                                name="id"
-                               value="<?= htmlspecialchars((string)$data['id']) ?>">
+                               value="<?= htmlspecialchars((string)$id) ?>">
 
                         <!-- TAHUN AJARAN -->
                         <div class="mb-3">
@@ -97,7 +128,7 @@ $guru = mysqli_query(
                                     class="form-select"
                                     required>
 
-                                <option value="">Pilih Tahun Ajaran</option>
+                                <option value="">-- Pilih Tahun Ajaran --</option>
 
                                 <?php while ($row = mysqli_fetch_assoc($tahun)) { ?>
                                     <option
@@ -124,7 +155,7 @@ $guru = mysqli_query(
                                     class="form-select"
                                     required>
 
-                                <option value="">Pilih Kelas</option>
+                                <option value="">-- Pilih Kelas --</option>
 
                                 <?php while ($row = mysqli_fetch_assoc($kelas)) { ?>
                                     <option
@@ -151,7 +182,7 @@ $guru = mysqli_query(
                                     class="form-select"
                                     required>
 
-                                <option value="">Pilih Guru</option>
+                                <option value="">-- Pilih Guru --</option>
 
                                 <?php while ($row = mysqli_fetch_assoc($guru)) { ?>
                                     <option
@@ -177,7 +208,7 @@ $guru = mysqli_query(
                                    name="tanggal_mulai"
                                    id="tanggal_mulai"
                                    class="form-control"
-                                   value="<?= htmlspecialchars($data['tanggal_mulai']) ?>"
+                                   value="<?= htmlspecialchars((string)$data['tanggal_mulai']) ?>"
                                    required>
                         </div>
 
@@ -191,7 +222,7 @@ $guru = mysqli_query(
                                    name="tanggal_selesai"
                                    id="tanggal_selesai"
                                    class="form-control"
-                                   value="<?= htmlspecialchars($data['tanggal_selesai']) ?>"
+                                   value="<?= htmlspecialchars((string)$data['tanggal_selesai']) ?>"
                                    required>
                         </div>
 
@@ -207,13 +238,13 @@ $guru = mysqli_query(
                                     required>
 
                                 <option value="1"
-                                    <?= $data['status_aktif'] == 1
+                                    <?= (int)$data['status_aktif'] === 1
                                         ? 'selected' : '' ?>>
                                     Aktif
                                 </option>
 
                                 <option value="0"
-                                    <?= $data['status_aktif'] == 0
+                                    <?= (int)$data['status_aktif'] === 0
                                         ? 'selected' : '' ?>>
                                     Tidak Aktif
                                 </option>
