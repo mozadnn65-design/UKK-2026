@@ -3,6 +3,8 @@
 include 'includes/cek_session.php';
 include 'config/koneksi.php';
 
+cek_role(['admin']);
+
 $sql = "SELECT * FROM t_guru ORDER BY nama ASC";
 $hasil = mysqli_query($koneksi, $sql);
 ?>
