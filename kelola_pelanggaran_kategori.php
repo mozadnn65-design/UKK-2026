@@ -4,6 +4,8 @@
 include 'includes/cek_session.php';
 include 'config/koneksi.php';
 
+cek_role(['admin']);
+
 $sql = "SELECT * FROM t_pelanggaran_kategori ORDER BY id DESC";
 $hasil = mysqli_query($koneksi, $sql);
 ?>
