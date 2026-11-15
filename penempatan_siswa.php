@@ -5,6 +5,8 @@
 include 'includes/cek_session.php';
 include 'config/koneksi.php';
 
+cek_role(['admin']);
+
 $sql = "SELECT
             ks.id,
             s.id AS siswa_id,
