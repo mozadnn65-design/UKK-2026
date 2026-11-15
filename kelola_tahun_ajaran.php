@@ -4,6 +4,8 @@
 include 'includes/cek_session.php';
 include 'config/koneksi.php';
 
+cek_role(['admin']);
+
 $sql = "SELECT * FROM t_tahun_ajaran ORDER BY tanggal_mulai DESC";
 $hasil = mysqli_query($koneksi, $sql);
 ?>
