@@ -4,6 +4,8 @@
 include 'includes/cek_session.php';
 include 'config/koneksi.php';
 
+cek_role(['admin']);
+
 $sql = "SELECT
             w.*,
             k.nama AS nama_kelas,
